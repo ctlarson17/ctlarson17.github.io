@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+    <title> Caleb Larson's Portfolio </title>
+</head>
+<body class="view-web-page">
+    <nav>
+        <div class="nav-logo">
+            <a href="index.html" class="nav-item logo">Caleb Larson</a>
+        </div>
+        
+        <div class="nav-group">
+            <a href="view-work.html" class="nav-item">View Work</a>
+            <a href="about-me.html" class="nav-item">About Me</a> <!-- Change the '#' to your about-me page link when you create it -->
+        </div>
+        <div class="nav-contact">
+            <a class="nav-item">Contact</a> <!-- Change the '#' to your contact page link when you create it -->
+        </div>
+    </nav>
+    
+    <!-- Back Button --> 
+    <button id="backButton" onclick="location.href='view-work.html'"><- Back</button>
+
+    <!--Page Contents--> 
+    <main>
+
+        <section class="work-example">
+        
+            <h1>Web Design Experience</h1>
+            
+            <p>A vast majority of my design experience has been focused on creating online user experiences for people on computers. 
+                <br>
+                The following work examples are just a few projects that I have been a part of. 
+            </p>
+          
+        </section>
+
+        <!-- Sample section for one of your works -->
+        <section class="work-example">
+            <!-- Header for the example -->
+            <h2>Project Title</h2>
+            
+            <!-- Contextual Text -->
+            <p>This section contains the context of the project. Explain briefly what the project was about and its objectives.</p>
+            
+            <!-- Image illustrating what you did -->
+            <img src="path-to-your-image.jpg" alt="Short description of the image">
+
+            <!-- More detailed text -->
+            <p>This section contains a more in-depth description of the work. You can elaborate on challenges faced, your role in the project, technologies or methodologies used, outcomes, and any other relevant details.</p>
+        </section>
+
+        <!-- You can duplicate the above "work-example" section for each project you wish to display. -->
+    </main>
+
+     <!-- Contact Modal -->
+<div id="contactModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Contact Me</h2>
+      <p>Email: <a href="mailto:ctlarson17@gmail.com">ctlarson17@gmail.com</a></p>
+      <p>LinkedIn: <a href="https://www.linkedin.com/in/calebtlarson/" target="_blank">in/calebtlarson/</a></p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    var modal = document.getElementById("contactModal");
+    var btn = document.querySelector(".nav-contact .nav-item");
+    var span = document.querySelector(".close");
+  
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+  
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+  
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  });
+</script>  
+</body>
+</html>
