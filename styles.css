@@ -136,6 +136,13 @@ h1 {
     margin-right: auto;
 }
 
+.example-image {
+    width: 100%;  /* fill the container horizontally */
+    height: auto; /* adjust height automatically based on the width while maintaining the aspect ratio */
+    display: block; /* to remove any default space below the image */
+    margin: 0 auto; /* this will center the image if its container is wider than the image's intrinsic width */
+}
+
 /* Modal styles */
 .modal {
     display: none; /* Initially hidden */
