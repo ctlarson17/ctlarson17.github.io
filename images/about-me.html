@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+    <title>Caleb Larson's Portfolio</title>
+</head>
+<body class="view-web-page">
+    <nav>
+        <div class="nav-logo">
+            <a href="index.html" class="nav-item logo">Caleb Larson</a>
+        </div>
+        
+        <div class="nav-group">
+            <a href="view-work.html" class="nav-item">View Work</a>
+            <a href="about-me.html" class="nav-item">About Me</a> <!-- Change the '#' to your about-me page link when you create it -->
+        </div>
+        <div class="nav-contact">
+            <a class="nav-item">Contact</a> <!-- Change the '#' to your contact page link when you create it -->
+        </div>
+    </nav>
+
+    <main class="about-me">
+        <section class="about-container">
+        
+            
+            <img src="About Me.png" alt="A collage of all the things that are special to me." class = portrait2>
+           
+            <div class="about-text">
+                <h2>About me</h2>
+                
+                <p>I began my career in Indianapolis as a Business Analyst for KSM Consulting. My interest in product design quickly grew, and I transitioned to become KSMC's first in-house UX Designer.</p>
+
+                <p>Now based in Salt Lake City, I focus on designing digital products. I see AI as a game-changer for our future work, and I'm excited about its potential.</p>
+        
+                <p>Outside of work, I live with my partner Drew and our dog Bing. My downtime is spent rock climbing, skiing, fishing, and hiking.</p>
+
+            </div>
+           
+    </section>
+
+        <!-- You can duplicate the above "work-example" section for each project you wish to display. -->
+    </main>
+
+     <!-- Contact Modal -->
+<div id="contactModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Contact Me</h2>
+      <p>Email: <a href="mailto:ctlarson17@gmail.com">ctlarson17@gmail.com</a></p>
+      <p>LinkedIn: <a href="https://www.linkedin.com/in/calebtlarson/" target="_blank">in/calebtlarson/</a></p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    var modal = document.getElementById("contactModal");
+    var btn = document.querySelector(".nav-contact .nav-item");
+    var span = document.querySelector(".close");
+  
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+  
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+  
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  });
+</script>  
+</body>
+</html>

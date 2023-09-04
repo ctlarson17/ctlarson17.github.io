@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,111 +8,155 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
-    <title> Caleb Larson's Portfolio </title>
+    <title>Caleb Larson's Portfolio</title>
 </head>
+
 <body class="view-web-page">
+
     <nav>
         <div class="nav-logo">
             <a href="index.html" class="nav-item logo">Caleb Larson</a>
         </div>
-        
         <div class="nav-group">
             <a href="view-work.html" class="nav-item">View Work</a>
-            <a href="about-me.html" class="nav-item">About Me</a> <!-- Change the '#' to your about-me page link when you create it -->
+            <a href="about-me.html" class="nav-item">About Me</a>
         </div>
         <div class="nav-contact">
-            <a class="nav-item">Contact</a> <!-- Change the '#' to your contact page link when you create it -->
+            <a class="nav-item">Contact</a>
         </div>
     </nav>
-    
-    <!-- Back Button --> 
-    <button id="backButton" onclick="location.href='view-work.html'"><- Back</button>
 
-    <!--Page Contents--> 
-    <main>
+    <div class="wrapper">
+  
+      <!-- Sidebar/Scrollspy -->
+      <aside class="sidebar">
+          <!-- Back Button -->
+        <button id="backButton" onclick="location.href='view-work.html'">Back</button>
 
-        <section class="work-example">
-        
-            <h1>Web Design Experience</h1>
+        <!-- Scroll Spy -->
+        <aside id="scrollspy">
+          <ul>
+            <li><a href="#section1">Supply Chain Risk Analysis</a></li>
+            <li><a href="#section2">Badge Builder</a></li>
+            <li><a href="#section3">Data Sharing Platform</a></li>
+            <li ><a href="#section4">Live Feature Update</a></li>
             
-            <p>A vast majority of my design experience has been focused on creating online user experiences for people on computers. 
-                <br>
-                The following work examples are just a few projects that I have been a part of. 
-            </p>
+        </ul>
+        </aside>
+      </aside>
+  
+      <!-- Main Content -->
+      <main class="view-web" id="content">
+        <section class="work-example">
+          <h1>Web Design Experience</h1>
+          <p>A vast majority of my design experience has been focused on creating online user experiences for people on computers.
+              <br>
+              The following work examples are just a few projects that I have been a part of.
+          </p>
+      </section>
+
+      <!--Section 1: AMARO -->
+      <section class="work-example" id="section1">
+          <!-- Header for the example -->
+          <h2>Supply Chain Risk Analysis Tool</h2>
+          <!-- Contextual Text -->
+          <p>One of the first big projects I worked on was a tool which assisted supply chain risk analysis. 
+              This was a huge project with many features. A serious challenge for this project was the logically and intuitvely laying out an immense volumn of data. 
+          </p>
+          <img src="images/Web A1.png" alt="Supply Chain Risk Analysis 1" class="example-image">
+          <p>This page shows a personnel profile page. The user would come here perform a risk analysis on the leaders in a company.</p>
+          <img src="images/Web A2.png" alt="Supply Chain Risk Analysis 2" class="example-image">
+          <p>This page shows the timeline of a microelectronic part. These timelines could get very tricky, as companies would buy and sell part IP from each other in addition to making changes to the part itself over its lifetime. Each time a change is made to a part, its manufacturer must issue a notification to all consumers of that part. This tool was intended to quickly visualize the history of a part, and quickly navigate to any occurances which indicate a higher risk profile.</p>
+      </section>
+
+
+      <!--Section 2: GBB -->
+      <section class="work-example" id="section2">
+          <!-- Header for the example -->
+          <h2>Guided Badge Builder</h2>
+          <!-- Contextual Text -->
+          <p>This project is one I worked on when I started at RainFocus. Their existing badge building solution relied heavily on knowing Html, CSS, and Javascript. We needed to find a way to help users easily build badge templates for their events. 
+          The guided badge builder is what we came up with.   
+          </p>
+          <img src="images/Web B1.png" alt="Guided Badge Builder 1" class="example-image">
+          <p>This fist page shows the mapping process. Often times our clients want to map certain images to their badges depending on an attribute value. This allows users to upload a unique background image for each value of their selected attribute.</p>
+          <img src="images/Web B2.png" alt="Guided Badge Builder 2" class="example-image">
+          <p>Once backgrounds are mapped, the user gets to set up their content. There is always a fine line between flexibilty and control, and I think we struck it perfectly with this one. We give the user a 9-point grid to place the content of their badge on. Each line of the "cluster" can receive its own custom styling, allowing for any combination of font and color the user may want.</p>
+      </section>
+
+
+       <!--Section 3: GBB -->
+       <section class="work-example" id="section3">
+        <!-- Header for the example -->
+        <h2>Cross-Agency Data Sharing Project</h2>
+        <!-- Contextual Text -->
+        <p>This was a project I did for the state of Indiana. 
+          The job of this product was to facilitate inter-agency data sharing, as well as provide a platform for secure data analysis work.  
+          This project includes data-request workflows, virtual desktop control and management, as well as a data catalog that different agencies can contribute to. 
           
+        </p>
+        <img src="images/Web D.png" alt="Data Sharing Platform example" class="example-image">
         </section>
 
-        <!-- Sample section for one of your works -->
-        <section class="work-example">
-            <!-- Header for the example -->
-            <h2>Supply Chain Risk Analysis Tool</h2>
-            
-            <!-- Contextual Text -->
-            <p>One of the first big projects I worked on was a tool which assisted supply chain risk analysis. 
-                This was a huge project with many features. A serious challenge for this project was the logically and intuitvely laying out an immense volumn of data. 
-            </p>
-            
-            <img src="Web A1.png" alt="Supply Chain Risk Analysis 1" class="example-image">
 
-            <p>This page shows a personnel profile page. The user would come here perform a risk analysis on the leaders in a company.</p>
-        
-            <img src="Web A2.png" alt="Supply Chain Risk Analysis 2" class="example-image">
+      <!--Section 4: GBB -->
+      <section class="work-example" id="section4">
+        <!-- Header for the example -->
+        <h2>Live Feature Update</h2>
+        <!-- Contextual Text -->
+        <p>This is a project I did during my time at Verisk on the PropTech team.  They had this product that helped home contractors estimate job costs. As a contractor walked through a house they could enter all of the little jobs that come together in the full estimate. Some of the cost estimates that we provided were really bundles of costs, all of the little parts and pieces have their own price tag. 
+          The idea is that we wanted to allow the user to modify the smaller component prices contained within the larger job cost.  This was a product that was already in flight, so it must not disrupt existing workflows, while contributing a new useful feature.  
+        </p>
+        <img src="images/Web C.png" alt="PropTech Cost Builder." class="example-image">
+        </section>
 
-            <p>This page shows the timeline of a microelectronic part.  These timelines could get very tricky, as companies would buy and sell part IP from each other in addition to making changes to the part itself over its lifetime. Each time a change is made to a part, its manufacturer must issue a notification to all consumers of that part.  This tool was intended to quickly visualize the history of a part, and quickly navigate to any occurances which indicate a higher risk profile.</p>
-        
-          </section>
+       
 
-          <section class="work-example">
-            <!-- Header for the example -->
-            <h2>Guided Badge Builder</h2>
-            
-            <!-- Contextual Text -->
-            <p>This project is one I worked on when I started at RainFocus. Their existing badge building solution relied heavily on knowing Html, CSS, and Javascript. We needed to find a way to help users easily build badge templates for their events. 
-            The guided badge builder is what we came up with.   
-            </p>
-            
-            <img src="Web B1.png" alt="Guided Badge Builder 1" class="example-image">
 
-            <p>This fist page shows the mapping process. Often times our clients want to map certain images to their badges depending on an attribute value. This allows users to upload a unique background image for each value of their selected attribute.</p>
-        
-            <img src="Web B2.png" alt="Guided Badge Builder 2" class="example-image">
+      </main>
+  
+  </div>
+  
 
-            <p>Once backgrounds are mapped, the user gets to set up their content. There is always a fine line between flexibilty and control, and I think we stuck it perfectly with this one.  We give the user a 9-point grid to place the content of their badge on.  Each line of the "cluster" can receive its own custom styling, allowing for any combination of font and color the user may want.</p>
-        
-          </section>
-        
-    </main>
 
-     <!-- Contact Modal -->
-<div id="contactModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Contact Me</h2>
-      <p>Email: <a href="mailto:ctlarson17@gmail.com">ctlarson17@gmail.com</a></p>
-      <p>LinkedIn: <a href="https://www.linkedin.com/in/calebtlarson/" target="_blank">in/calebtlarson/</a></p>
+
+
+    <!--     NOTHING GOING ON DOWN HERE, don't worry about it sweethart.    -->
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Contact Me</h2>
+            <p>Email: <a href="mailto:ctlarson17@gmail.com">ctlarson17@gmail.com</a></p>
+            <p>LinkedIn: <a href="https://www.linkedin.com/in/calebtlarson/" target="_blank">in/calebtlarson/</a></p>
+        </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-    var modal = document.getElementById("contactModal");
-    var btn = document.querySelector(".nav-contact .nav-item");
-    var span = document.querySelector(".close");
-  
-    btn.onclick = function() {
-      modal.style.display = "block";
-    }
-  
-    span.onclick = function() {
-      modal.style.display = "none";
-    }
-  
-    window.onclick = function(event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    }
-  });
-</script>  
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var modal = document.getElementById("contactModal");
+            var btn = document.querySelector(".nav-contact .nav-item");
+            var span = document.querySelector(".close");
+      
+            btn.onclick = function() {
+                modal.style.display = "block";
+            }
+      
+            span.onclick = function() {
+                modal.style.display = "none";
+            }
+      
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="scrollspy.js"></script>
+
 </body>
+
 </html>

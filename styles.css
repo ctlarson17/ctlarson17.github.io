@@ -18,11 +18,15 @@ a {
 /* Navigation styles */
 nav {
     display: flex;
+    position: sticky;
     justify-content: space-between;
     align-items: center;
     border-bottom: 3px solid black;
+    top: 0;
     padding: 0;
     margin: 0; 
+    background-color: #FDFDF8;
+    z-index: 1000;
 }
 
 h1 {
@@ -35,6 +39,40 @@ h1 {
     letter-spacing: -2px;
 }
 
+ul{
+    padding-left: 0;
+    padding-right: 100px; /* I made this kind of big to push the scroll spy items to their own lines.  It keeps trying to shove two options into the same line and I don't like that. */
+}
+
+li {
+    padding-left: 0px;
+    padding-right:0px;
+    padding-bottom: 0px;
+    line-height: normal;
+    display: inline-block;
+    letter-spacing: normal;
+}
+
+a {
+    padding-left: 16px;
+    padding-right:0px;
+    padding-bottom: 0px;
+    /* line-height: normal; */
+    display: inline-block;
+    letter-spacing: normal;
+}
+
+ .active {
+    border-bottom: 1px solid black; 
+} 
+
+li:active{
+    border-bottom: 1px solid black;
+}
+li:hover{
+    border-bottom: 1px solid black;
+    font-weight: 800;
+}
 .nav-logo {
     display:flex;
     flex-basis: 232px;
@@ -58,7 +96,7 @@ h1 {
     display: flex;
     align-items: right;
     justify-content: right;
-    flex-basis:216px;
+    flex-basis:232px;
     padding-right: 16px;
 }
 
@@ -91,14 +129,14 @@ h1 {
 }
 
 .portrait {
-    max-width: 400px; /* or your preferred width */
+    max-width: 400px; 
     height: auto;
     display: block;
 }
 
 
 
-/* View Work Jumping page styles */
+/* View-Work Jumping page styles */
 .view-work-container {
     display: flex;
     height: calc(100vh - 49px); /* Adjusted for the nav bar height, including its border */
@@ -130,10 +168,53 @@ h1 {
 }
 
 /* View Experience Page Styles */ 
-.view-web-page main, .view-mobile-page main, .view-design-page main {
+.wrapper {
+    display: flex;
+}
+
+/* Back button for the view experience pages */ 
+#backButton {
+    position: sticky;
+    margin-top: 16px;
+    left: 16px;
+    background-color: #FDFDF8;  /* You can choose any color */
+    border: 2px solid #000;  /* Adjust border as needed */
+    padding: 10px 20px;      /* Adjust padding as needed */
+    font-size: 16px;         /* Adjust font size as needed */
+    cursor: pointer;
+    z-index: 10;             /* Ensures the button is above other elements but under the nav */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+#backButton:hover {
+    background-color: #000; /* Change color on hover */
+    color: #FDFDF8;            /* Change text color on hover */
+}
+
+p {
+    letter-spacing: normal;
+}
+
+.view-web, .view-mobile, .view-design, .about-me{
     max-width: 60vw;
     margin-left: auto;
     margin-right: auto;
+}
+
+
+
+
+
+.sidebar {
+    position: fixed;      /* Makes it sticky */
+    top: 40px;             /* Offsets from the top by the height of the top navigation */
+    height: 100vh;         /* Takes the full height of the viewport */
+    width: 20vw;           /* Takes 20% of the viewport's width */
+    left: 0;               /* Aligns it to the left of its containing element */
+    overflow-y: auto;      /* Adds scroll if content overflows vertically */
+    /*background-color: #f9f9f9; /* Optional: A light background color for visual differentiation */
+    /*border-right: 1px solid #ccc;  /*Optional: A border to separate it from the content */
+    /*padding: 1rem;         /* Optional: Some spacing inside the sidebar */
 }
 
 .example-image {
@@ -141,8 +222,14 @@ h1 {
     height: auto; /* adjust height automatically based on the width while maintaining the aspect ratio */
     display: block; /* to remove any default space below the image */
     margin: 0 auto; /* this will center the image if its container is wider than the image's intrinsic width */
+    box-shadow: 0px 2px 4px 0px rgba(157, 157, 157, 0.25);
 }
-
+.example-gif {
+    height: 700px;
+    display: block; /* to remove any default space below the image */
+    margin: 0 auto; /* this will center the image if its container is wider than the image's intrinsic width */
+    box-shadow: 0px 2px 4px 0px rgba(157, 157, 157, 0.25);
+}
 /* Modal styles */
 .modal {
     display: none; /* Initially hidden */
@@ -186,28 +273,7 @@ h1 {
     color: #FDFDF8;
 }
 
-/* Back button for the view experience pages */ 
-#backButton {
-    position: sticky;
-    margin-top: 16px;
-    left: 16px;
-    background-color: #FDFDF8;  /* You can choose any color */
-    border: 2px solid #000;  /* Adjust border as needed */
-    padding: 10px 20px;      /* Adjust padding as needed */
-    font-size: 16px;         /* Adjust font size as needed */
-    cursor: pointer;
-    z-index: 10;             /* Ensures the button is above other elements but under the nav */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-}
 
-#backButton:hover {
-    background-color: #000; /* Change color on hover */
-    color: #FDFDF8;            /* Change text color on hover */
-}
-
-p {
-    letter-spacing: normal;
-}
 
 /* About Me Page styles. */
 .about-container {
