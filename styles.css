@@ -224,6 +224,16 @@ p {
     margin: 0 auto; /* this will center the image if its container is wider than the image's intrinsic width */
     box-shadow: 0px 2px 4px 0px rgba(157, 157, 157, 0.25);
 }
+
+.example-image-DS {
+    width: 100%;  /* fill the container horizontally */
+    height: auto; /* adjust height automatically based on the width while maintaining the aspect ratio */
+    display: block; /* to remove any default space below the image */
+    margin: 0 auto; /* this will center the image if its container is wider than the image's intrinsic width */
+    margin-bottom: 16px;
+    box-shadow: 0px 2px 4px 0px rgba(157, 157, 157, 0.25);
+}
+
 .example-gif {
     height: 700px;
     display: block; /* to remove any default space below the image */
