@@ -13,47 +13,49 @@
 
 <body class="bg-background-yellow font-inconsolata">
    
-   <!-- TOP NAV -->
-   <div class="w-full h-14 px-6 border-b-2 border-black fixed z-50 bg-background-yellow md:grid md:grid-cols-[1.5fr,2fr,1.5fr] grid-cols-1 items-center justify-center">
+    <!-- TOP NAV -->
+    <div class="w-full h-14 px-6 border-b-2 border-black fixed z-50 bg-background-yellow md:grid md:grid-cols-[1.5fr,2fr,1.5fr] grid-cols-1 items-center justify-center">
 
-    <!-- Left: Name (acts as home button) and Hamburger for mobile -->
-    <div class="flex items-center justify-between w-full h-full md:justify-start">
-        <a href="index.html" class="flex items-center h-full hover:bg-black hover:text-white">
-            <span class="text-4xl font-inconsolata tracking-tighter font-medium">
-                Caleb Larson
-            </span>
-        </a>
-        <img src="images/menu-icon.png" alt="Menu" class="h-6 w-auto cursor-pointer md:hidden" id="hamburgerMenu">
-    </div>
+        <!-- Left: Name (acts as home button) and Hamburger for mobile -->
+        <div class="flex items-center justify-between w-full h-full md:justify-start">
+            <a href="index.html" class="flex items-center h-full hover:bg-black hover:text-white">
+                <span class="text-4xl font-inconsolata tracking-tighter font-medium">
+                    Caleb Larson
+                </span>
+            </a>
+            <img src="images/menu-icon.png" alt="Menu" class="h-6 w-auto cursor-pointer md:hidden" id="hamburgerMenu">
+        </div>
 
-    <!-- Center: Other links (Hidden on md and below) -->
-    <div class="hidden md:flex items-center justify-center space-x-16 h-full">
-        <!-- First Button -->
-        <a href="view-work-fork.html" class="flex items-center h-full hover:bg-black hover:text-white">
-            <span class="text-xl font-inconsolata tracking-tighter font-medium">
-                View Work
-            </span>
-        </a>
-        
-        <!-- Second Button -->
-        <a href="about-me.html" class="flex items-center hover:bg-black hover:text-white h-full">
-            <span class="text-xl">About Me</span>
-        </a>
-    </div>
+        <!-- Center: Other links (Hidden on md and below) -->
+        <div class="hidden md:flex items-center justify-center space-x-16 h-full">
+            <!-- First Button -->
+            <a href="view-work-fork.html" class="flex items-center h-full hover:bg-black hover:text-white">
+                <span class="text-xl font-inconsolata tracking-tighter font-medium">
+                    View Work
+                </span>
+            </a>
+            
+            <!-- Second Button -->
+            <a href="about-me.html" class="flex items-center hover:bg-black hover:text-white h-full">
+                <span class="text-xl">About Me</span>
+            </a>
+        </div>
 
-    <!-- Right: Contact (Visible only on md and above) -->
-    <div class="hidden md:flex items-center justify-end h-full">
-        <div class="flex items-center h-full hover:bg-black hover:text-white">
-            <span onclick="toggleModal()" class="cursor-pointer text-xl font-inconsolata tracking-tighter font-medium">
-                Contact
-            </span>
+        <!-- Right: Contact (Visible only on md and above) -->
+        <div class="hidden md:flex items-center justify-end h-full">
+            <div class="flex items-center h-full hover:bg-black hover:text-white">
+                <span onclick="toggleModal()" class="cursor-pointer text-xl font-inconsolata tracking-tighter font-medium">
+                    Contact
+                </span>
+            </div>
         </div>
     </div>
-</div>
+
+
 
     <!-- Drawer: Initially hidden -->
     <div id="drawerBackdrop" class="md:hidden fixed top-14 left-0 w-full h-full bg-black opacity-25 invisible pointer-events-none"></div>
-
+    
     <div id="navDrawer" class="md:hidden fixed top-14 pt-2 left-0 h-full w-64 bg-background-yellow shadow-xl transform -translate-x-full overflow-y-auto">
         <div class=" space-y-4">
             <a href="view-work-fork.html" class="px-4 text-xl block hover:bg-black hover:text-white">View Work</a>
@@ -85,36 +87,32 @@
         drawerBackdrop.addEventListener('click', toggleDrawer);
     </script>
 
-    
 
     <!-- BODY CONTENT -->
-    <div class="min-h-screen flex flex-col justify-center px-4 md:justify-center">
-
-        <div class="flex flex-col space-y-6 justify-center items-center p-t-4 md:flex-row md:space-y-0 md:space-x-6 md:p-t-0">
-            
-            
-            <!-- --- The Page Text---  -->
-            <div class="order-2 mt-4 text-left flex tracking-tighter justify-center md:order-1">
-                <h1 class="text-4xl">
-                    Hi, I am Caleb Larson.
-                    <br>
-                    I am a product designer.
-                    <br>
-                    
-                </h1>
-            </div>
-
-            <!-- The Image -->
-            <div class="order-1 mb-4 md:order-2 md:mb-0 md:mr-4">
-                <div class="w-88 h-88">
-                    <img src="images/Caleb.png" alt="What a sharp looking designer" class="w-full h-full object-cover">
-                    <!-- Add the b back at the end of Caleb for this -->
-                </div>
-            </div>
-
-        </div>
-
+    <div class="h-screen flex flex-col pt-14 md:flex-row">
+        <!-- Web Design Button -->
+        <a href="web-design.html" class="flex-1 flex items-center justify-center border-b-2 md:border-r-2 border-black hover:bg-black hover:text-white transition-colors">
+            <button class="text-xl w-full h-full">
+                Web Design
+            </button>
+        </a>
+    
+        <!-- Mobile Design Button -->
+        <a href="mobile-design.html" class="flex-1 flex items-center justify-center border-b-2 md:border-r-2 border-black hover:bg-black hover:text-white transition-colors">
+            <button class="text-xl w-full h-full">
+                Mobile Design
+            </button>
+        </a>
+    
+        <!-- Design Systems Button -->
+        <a href="design-systems.html" class="flex-1 flex items-center justify-center hover:bg-black hover:text-white transition-colors">
+            <button class="text-xl w-full h-full">
+                Design Systems
+            </button>
+        </a>
     </div>
+    
+      
     
     <!-- Contact Modal -->
     <div>
