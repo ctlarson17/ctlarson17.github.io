@@ -34,7 +34,7 @@ export function LoginForm() {
       <div className="brand">
         <div className="small">🌊 Private assistant</div>
         <h1>Vince</h1>
-        <p>Replace the old portfolio with a locked front door. Simple username + password auth first; stronger auth later.</p>
+        <p>A private front door with a warmer, more polished feel. Simple username + password auth first; stronger auth later.</p>
       </div>
 
       <label className="field">

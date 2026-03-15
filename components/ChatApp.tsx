@@ -68,7 +68,7 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
         <div className="brand">
           <div className="small">🌊 Vince</div>
           <h1>Private chat</h1>
-          <p>A Vercel-friendly shell built to stay portable if you ever move to Cloudflare.</p>
+          <p>A private, warm-toned shell for talking with Vince without the cold SaaS look.</p>
         </div>
 
         <div className="sidebar-section sidebar-kv">
