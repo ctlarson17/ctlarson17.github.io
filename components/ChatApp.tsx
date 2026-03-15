@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { UiMessage } from '@/lib/types';
 
 export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
@@ -18,6 +18,11 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);
   const status = useMemo(() => (loading ? 'Thinking…' : 'Ready'), [loading]);
+  const endRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, loading]);
 
   async function submit() {
     const text = draft.trim();
@@ -67,7 +72,7 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
 
         <div className="sidebar-section sidebar-kv">
           <div><span className="dot" />{status}</div>
-          <div>Auth: password cookie</div>
+          <div>Auth: username + password</div>
           <div>Host target: Vercel</div>
           <div>Gateway layer: isolated</div>
         </div>
@@ -83,7 +88,7 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
         <div className="header">
           <div>
             <h2>Chat</h2>
-            <div className="small">Start simple. Tighten auth and wire live OpenClaw transport next.</div>
+            <div className="small">Latest messages stay pinned above the composer.</div>
           </div>
         </div>
 
@@ -93,9 +98,10 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
               {message.content}
             </div>
           ))}
+          <div ref={endRef} />
         </div>
 
-        <div className="composer">
+        <div className="composer sticky-composer">
           <textarea
             className="textarea"
             value={draft}
