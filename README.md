@@ -23,6 +23,7 @@ Build a private assistant web app for Lars that is:
 
 Copy `.env.example` to `.env.local` for local dev and set values:
 
+- `APP_USERNAME`
 - `APP_PASSWORD`
 - `SESSION_COOKIE_SECRET`
 - `OPENCLAW_GATEWAY_HTTP_URL`

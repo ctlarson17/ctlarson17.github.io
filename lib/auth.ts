@@ -45,8 +45,14 @@ export async function clearSessionCookie() {
   store.set(COOKIE_NAME, '', { path: '/', maxAge: 0 });
 }
 
-export function passwordMatches(input: string) {
-  const expected = process.env.APP_PASSWORD;
+function safeEqual(input: string, expected?: string) {
   if (!expected) return false;
-  return crypto.timingSafeEqual(Buffer.from(input), Buffer.from(expected));
+  const a = Buffer.from(input);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
+export function credentialsMatch(username: string, password: string) {
+  return safeEqual(username, process.env.APP_USERNAME) && safeEqual(password, process.env.APP_PASSWORD);
 }
