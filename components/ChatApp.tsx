@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { UiMessage } from '@/lib/types';
+import { MarkdownMessage } from '@/components/MarkdownMessage';
 
 export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
   const starter: UiMessage[] = initialMessages.length
@@ -95,7 +96,7 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
         <div className="messages">
           {messages.map((message) => (
             <div key={message.id} className={`message ${message.role}`}>
-              {message.content}
+              <MarkdownMessage content={message.content} />
             </div>
           ))}
           <div ref={endRef} />
