@@ -3,20 +3,17 @@
 import { useMemo, useState } from 'react';
 import type { UiMessage } from '@/lib/types';
 
-const starter: UiMessage[] = [
-  {
-    id: 'welcome',
-    role: 'assistant',
-    content: 'Private chat UI is live. Right now the backend is scaffolded in a portable way. Next wiring step is live OpenClaw Gateway chat transport.',
-  },
-  {
-    id: 'note',
-    role: 'system',
-    content: 'Old portfolio files were moved into legacy-portfolio/ so nothing got lost.',
-  },
-];
+export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
+  const starter: UiMessage[] = initialMessages.length
+    ? initialMessages
+    : [
+        {
+          id: 'welcome',
+          role: 'assistant',
+          content: 'Your private site is connected, but this conversation has no history yet. Say hi and we will start a fresh thread.',
+        },
+      ];
 
-export function ChatApp() {
   const [messages, setMessages] = useState<UiMessage[]>(starter);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);

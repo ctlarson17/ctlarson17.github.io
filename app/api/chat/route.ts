@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { echoReply } from '@/lib/openclaw';
+import { sendMessage } from '@/lib/openclaw';
 import { isAuthenticated } from '@/lib/auth';
 
 export async function POST(request: Request) {
@@ -15,6 +15,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Message is required' }, { status: 400 });
   }
 
-  const reply = await echoReply(message);
-  return NextResponse.json({ ok: true, reply });
+  try {
+    const reply = await sendMessage(message);
+    return NextResponse.json({ ok: true, reply });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Chat request failed' },
+      { status: 500 },
+    );
+  }
 }
