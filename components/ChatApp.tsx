@@ -183,6 +183,7 @@ export function ChatApp({
         { id: crypto.randomUUID(), role: 'assistant' as const, content: String(json.reply) },
       ].slice(-MAX_LOCAL_MESSAGES));
     } catch (error) {
+      console.error('[vince-image] submit failure', error);
       setMessages((current) => [
         ...current,
         {

@@ -304,6 +304,13 @@ export async function sendMessageViaBrowserGateway(
   attachments: ClientAttachment[],
   config: BrowserGatewayConfig,
 ): Promise<string> {
+  const imageCount = attachments.filter((attachment) => attachment.kind === 'image' && attachment.dataUrl).length;
+  console.log('[vince-image] browser gateway path start', {
+    imageCount,
+    sessionKey: config.sessionKey,
+    hasToken: Boolean(config.gatewayToken),
+    gatewayHttpUrl: config.gatewayHttpUrl,
+  });
   const trimmed = input.trim();
   if (!trimmed && attachments.length === 0) {
     throw new Error('Message is empty');
