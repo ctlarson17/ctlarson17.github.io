@@ -215,7 +215,7 @@ async function signConnectPayload(identity: DeviceIdentity, nonce: string, token
   const message = [
     'v2',
     identity.deviceId,
-    'openclaw-control-ui',
+    'webchat-ui',
     'webchat',
     'operator',
     CONNECT_SCOPES.join(','),
