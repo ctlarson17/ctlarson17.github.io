@@ -164,6 +164,36 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
     var(--panel-2);
 }
 .sticky-composer { position: sticky; bottom: 0; z-index: 5; }
+.file-input { display: none; }
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+.attachment-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  font-size: 0.88rem;
+}
+.attachment-pill span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attachment-meta {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.pending-attachments { margin-bottom: 4px; }
 .row { display: flex; gap: 12px; align-items: center; }
 .row.wrap { flex-wrap: wrap; }
 .spacer { flex: 1; }
