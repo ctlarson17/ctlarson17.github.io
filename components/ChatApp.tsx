@@ -5,6 +5,7 @@ import type { ClientAttachment, UiMessage, UploadedFile } from '@/lib/types';
 import { MarkdownMessage } from '@/components/MarkdownMessage';
 import { prepareClientAttachments } from '@/lib/client-uploads';
 import { sendMessageViaBrowserGateway } from '@/lib/openclaw-browser';
+import { formatUserFacingError, normalizeMessageContent } from '@/lib/error-format';
 
 const STORAGE_KEY = 'vince-chat-messages-v1';
 const MAX_LOCAL_MESSAGES = 150;
@@ -26,13 +27,21 @@ function fallbackStarter(): UiMessage[] {
   ];
 }
 
+function sanitizeMessage(message: UiMessage): UiMessage {
+  return {
+    ...message,
+    content: normalizeMessageContent(message.content),
+  };
+}
+
 function sameMessage(a: UiMessage, b: UiMessage) {
   return a.role === b.role && a.content === b.content;
 }
 
 function mergeMessages(base: UiMessage[], incoming: UiMessage[]) {
-  const merged = [...base];
-  for (const message of incoming) {
+  const merged = [...base.map(sanitizeMessage)];
+  for (const rawMessage of incoming) {
+    const message = sanitizeMessage(rawMessage);
     const exists = merged.some((entry) => entry.id === message.id || sameMessage(entry, message));
     if (!exists) merged.push(message);
   }
@@ -89,7 +98,10 @@ export function ChatApp({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-MAX_LOCAL_MESSAGES)));
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(messages.slice(-MAX_LOCAL_MESSAGES).map(sanitizeMessage)),
+      );
     } catch {
       // ignore storage failures
     }
@@ -189,7 +201,7 @@ export function ChatApp({
         {
           id: crypto.randomUUID(),
           role: 'system' as const,
-          content: error instanceof Error ? error.message : 'Something went wrong.',
+          content: formatUserFacingError(error),
         },
       ].slice(-MAX_LOCAL_MESSAGES));
     } finally {
