@@ -15,12 +15,104 @@ type GatewayEvent = {
   error?: { code?: string; message?: string; details?: unknown };
 };
 
+type DeviceIdentity = {
+  deviceId: string;
+  publicKey: string;
+  privateKeyPkcs8: string;
+};
+
+const DEVICE_IDENTITY_KEY = 'vince-openclaw-device-identity-v1';
+const DEVICE_TOKEN_STORE_KEY = 'vince-openclaw-device-auth-v1';
+const CONNECT_SCOPES = ['operator.admin', 'operator.approvals', 'operator.pairing'];
+
 function randomId() {
   return crypto.randomUUID();
 }
 
 function getGatewayWsUrl(gatewayHttpUrl: string) {
   return gatewayHttpUrl.replace(/^http/, 'ws');
+}
+
+function toBase64Url(bytes: ArrayBuffer | Uint8Array) {
+  const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  let binary = '';
+  for (const byte of data) binary += String.fromCharCode(byte);
+  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/g, '');
+}
+
+function fromBase64Url(value: string) {
+  const normalized = value.replaceAll('-', '+').replaceAll('_', '/');
+  const padded = normalized + '='.repeat((4 - (normalized.length % 4 || 4)) % 4);
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+async function sha256Hex(bytes: Uint8Array) {
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function loadOrCreateDeviceIdentity(): Promise<DeviceIdentity | null> {
+  if (typeof window === 'undefined' || !crypto?.subtle) return null;
+
+  try {
+    const raw = window.localStorage.getItem(DEVICE_IDENTITY_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as DeviceIdentity;
+      if (parsed?.deviceId && parsed?.publicKey && parsed?.privateKeyPkcs8) {
+        return parsed;
+      }
+    }
+  } catch {
+    // ignore corrupt cache
+  }
+
+  try {
+    const keyPair = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+    const publicKeyRaw = new Uint8Array(await crypto.subtle.exportKey('raw', keyPair.publicKey));
+    const privateKeyPkcs8 = new Uint8Array(await crypto.subtle.exportKey('pkcs8', keyPair.privateKey));
+    const identity: DeviceIdentity = {
+      deviceId: await sha256Hex(publicKeyRaw),
+      publicKey: toBase64Url(publicKeyRaw),
+      privateKeyPkcs8: toBase64Url(privateKeyPkcs8),
+    };
+    window.localStorage.setItem(DEVICE_IDENTITY_KEY, JSON.stringify(identity));
+    return identity;
+  } catch {
+    return null;
+  }
+}
+
+function getStoredDeviceToken(deviceId: string) {
+  try {
+    const raw = window.localStorage.getItem(DEVICE_TOKEN_STORE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { version?: number; deviceId?: string; tokens?: Record<string, { token: string; scopes?: string[] }> };
+    if (parsed?.version !== 1 || parsed.deviceId !== deviceId || !parsed.tokens) return null;
+    return parsed.tokens.operator?.token || null;
+  } catch {
+    return null;
+  }
+}
+
+function storeDeviceToken(deviceId: string, token: string, scopes: string[] = []) {
+  try {
+    const payload = {
+      version: 1,
+      deviceId,
+      tokens: {
+        operator: {
+          token,
+          scopes,
+        },
+      },
+    };
+    window.localStorage.setItem(DEVICE_TOKEN_STORE_KEY, JSON.stringify(payload));
+  } catch {
+    // ignore storage failures
+  }
 }
 
 function extractTextFromMessage(message: any): string {
@@ -88,26 +180,94 @@ async function gatewayRpc<T>(ws: WebSocket, method: string, params: object) {
   });
 }
 
+async function waitForConnectChallenge(ws: WebSocket) {
+  return await new Promise<string | null>((resolve) => {
+    const timeout = window.setTimeout(() => {
+      cleanup();
+      resolve(null);
+    }, 1500);
+
+    const onMessage = (event: MessageEvent<string>) => {
+      try {
+        const payload = JSON.parse(String(event.data ?? '')) as GatewayEvent;
+        if (payload.type === 'event' && payload.event === 'connect.challenge' && typeof payload.payload?.nonce === 'string') {
+          cleanup();
+          resolve(payload.payload.nonce);
+        }
+      } catch {
+        // ignore unrelated messages
+      }
+    };
+
+    const cleanup = () => {
+      window.clearTimeout(timeout);
+      ws.removeEventListener('message', onMessage as EventListener);
+    };
+
+    ws.addEventListener('message', onMessage as EventListener);
+  });
+}
+
+async function signConnectPayload(identity: DeviceIdentity, nonce: string, token?: string | null) {
+  const pkcs8 = fromBase64Url(identity.privateKeyPkcs8);
+  const key = await crypto.subtle.importKey('pkcs8', pkcs8, { name: 'Ed25519' }, false, ['sign']);
+  const signedAt = Date.now();
+  const message = [
+    'v2',
+    identity.deviceId,
+    'openclaw-control-ui',
+    'webchat',
+    'operator',
+    CONNECT_SCOPES.join(','),
+    String(signedAt),
+    token ?? '',
+    nonce,
+  ].join('|');
+  const signature = await crypto.subtle.sign('Ed25519', key, new TextEncoder().encode(message));
+
+  return {
+    id: identity.deviceId,
+    publicKey: identity.publicKey,
+    signature: toBase64Url(signature),
+    signedAt,
+    nonce,
+  };
+}
+
 async function connectGatewayClient(ws: WebSocket, config: BrowserGatewayConfig) {
-  await gatewayRpc(ws, 'connect', {
+  const nonce = await waitForConnectChallenge(ws);
+  const identity = nonce ? await loadOrCreateDeviceIdentity() : null;
+  const storedDeviceToken = identity ? getStoredDeviceToken(identity.deviceId) : null;
+  const preferredToken = storedDeviceToken || config.gatewayToken;
+
+  const device = nonce && identity ? await signConnectPayload(identity, nonce, config.gatewayToken) : undefined;
+
+  const hello = await gatewayRpc<any>(ws, 'connect', {
     minProtocol: 3,
     maxProtocol: 3,
     client: {
-      id: 'webchat-ui',
-      version: 'site-chat-browser',
+      id: 'openclaw-control-ui',
+      version: 'vince-site',
       platform: navigator.platform || 'web',
       mode: 'webchat',
       instanceId: randomId(),
     },
     role: 'operator',
-    scopes: ['operator.read'],
-    caps: ['tool-events'],
+    scopes: CONNECT_SCOPES,
+    caps: [],
     auth: {
-      token: config.gatewayToken,
+      token: preferredToken,
     },
     userAgent: navigator.userAgent,
     locale: navigator.language || 'en-US',
+    device,
   });
+
+  if (identity && hello?.auth?.deviceToken) {
+    storeDeviceToken(identity.deviceId, hello.auth.deviceToken, hello.auth.scopes || []);
+  }
+
+  return hello;
 }
 
 async function openGatewaySocket(config: BrowserGatewayConfig) {
