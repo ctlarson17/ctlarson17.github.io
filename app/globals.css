@@ -58,7 +58,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
   color: var(--text);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 6px;
   padding: 14px 16px;
   outline: none;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
@@ -71,35 +71,33 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   box-shadow: 0 0 0 4px var(--accent-ring), inset 0 1px 0 rgba(255,255,255,0.04);
 }
 .btn {
-  border: 1px solid rgba(255, 221, 149, 0.18);
-  border-radius: 16px;
+  border: 1px solid rgba(240, 196, 102, 0.18);
+  border-radius: 6px;
   padding: 12px 18px;
-  background: linear-gradient(180deg, var(--accent-2), var(--accent) 58%, var(--accent-deep));
-  color: #281707;
-  font-weight: 800;
+  background: rgba(240, 196, 102, 0.12);
+  color: #f8efe3;
+  font-weight: 700;
   letter-spacing: 0.01em;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.22),
-    0 12px 28px rgba(0,0,0,.28),
-    0 0 24px rgba(218, 165, 32, 0.12);
+  backdrop-filter: blur(14px) saturate(1.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,.22);
 }
 .btn:hover:not(:disabled) {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
+  background: rgba(240, 196, 102, 0.18);
+  border-color: rgba(240, 196, 102, 0.28);
 }
 .btn.secondary {
-  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+  background: rgba(255,255,255,.04);
   color: var(--text);
   border: 1px solid var(--border);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  box-shadow: none;
 }
 .btn.secondary:hover:not(:disabled) {
-  background: linear-gradient(180deg, rgba(218, 165, 32, 0.10), rgba(218, 165, 32, 0.05));
+  background: rgba(255,255,255,.07);
 }
 .btn:disabled { opacity: .6; cursor: not-allowed; }
 .error { color: var(--danger); }
 
-.chat-shell { display: grid; grid-template-columns: 300px 1fr; min-height: 88vh; overflow: hidden; }
+.chat-shell { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 88vh; overflow: hidden; }
 .sidebar {
   border-right: 1px solid var(--border);
   padding: 28px 24px;
@@ -113,7 +111,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 .sidebar-section { margin-top: 28px; display: grid; gap: 10px; }
 .sidebar-kv { display: grid; gap: 10px; color: var(--muted); font-size: .95rem; }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 999px; background: #f0c466; margin-right: 8px; box-shadow: 0 0 18px rgba(240,196,102,.45); }
-.main { display: grid; grid-template-rows: auto 1fr auto; }
+.main { display: grid; grid-template-rows: auto 1fr auto; min-width: 0; }
 .header {
   display: flex;
   justify-content: space-between;
@@ -127,14 +125,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   padding: 28px;
   display: grid;
   gap: 18px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
   max-height: calc(88vh - 180px);
   background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0));
 }
 .message {
+  width: fit-content;
   max-width: min(780px, 100%);
+  min-width: 0;
   padding: 16px 18px;
-  border-radius: 22px;
+  border-radius: 6px;
   border: 1px solid var(--border);
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -184,19 +186,24 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   font-size: 0.92em;
   background: rgba(0,0,0,0.28);
   border: 1px solid rgba(240, 196, 102, 0.12);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 0.16rem 0.38rem;
 }
 .message pre {
   margin: 0 0 0.9rem;
   padding: 1rem 1.05rem;
+  max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
   background: linear-gradient(180deg, rgba(0,0,0,0.38), rgba(0,0,0,0.28));
   border: 1px solid rgba(240, 196, 102, 0.14);
-  border-radius: 14px;
+  border-radius: 6px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
 }
 .message pre code {
+  display: block;
+  min-width: 0;
+  white-space: pre;
   background: transparent;
   border: 0;
   padding: 0;
@@ -224,7 +231,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 
 @media (max-width: 860px) {
   .page-shell { padding: 0; }
-  .card { width: 100%; border-radius: 0; border-left: 0; border-right: 0; box-shadow: none; }
+  .card { width: 100%; min-width: 0; border-radius: 0; border-left: 0; border-right: 0; box-shadow: none; }
   .chat-shell { grid-template-columns: 1fr; min-height: 100vh; }
   @supports (height: 100dvh) {
     .chat-shell { min-height: 100dvh; }
