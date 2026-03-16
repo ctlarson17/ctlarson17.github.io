@@ -12,7 +12,18 @@ export default async function HomePage() {
 
   return (
     <main className="page-shell">
-      {authenticated ? <ChatApp initialMessages={initialMessages} /> : <LoginForm />}
+      {authenticated ? (
+        <ChatApp
+          initialMessages={initialMessages}
+          browserGatewayConfig={{
+            gatewayHttpUrl: process.env.OPENCLAW_GATEWAY_HTTP_URL || '',
+            gatewayToken: process.env.OPENCLAW_GATEWAY_TOKEN || '',
+            sessionKey: process.env.OPENCLAW_SESSION_KEY || 'agent:main:web:lars-site',
+          }}
+        />
+      ) : (
+        <LoginForm />
+      )}
     </main>
   );
 }
