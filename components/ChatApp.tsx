@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { UiMessage, UploadedFile } from '@/lib/types';
+import type { ClientAttachment, UiMessage, UploadedFile } from '@/lib/types';
 import { MarkdownMessage } from '@/components/MarkdownMessage';
+import { prepareClientAttachments } from '@/lib/client-uploads';
 
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -37,10 +38,12 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
     const text = draft.trim();
     if ((!text && pendingFiles.length === 0) || loading) return;
 
-    const uploads: UploadedFile[] = pendingFiles.map((file) => ({
+    const attachments: ClientAttachment[] = await prepareClientAttachments(pendingFiles);
+    const uploads: UploadedFile[] = attachments.map((file) => ({
       name: file.name,
       size: file.size,
       type: file.type || 'application/octet-stream',
+      note: file.note,
     }));
 
     const userMessage: UiMessage = {
@@ -57,13 +60,10 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('message', text);
-      pendingFiles.forEach((file) => formData.append('files', file));
-
       const res = await fetch('/api/chat', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, attachments }),
       });
 
       const json = await res.json();
@@ -128,6 +128,7 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
                     <div key={`${message.id}-${file.name}-${file.size}`} className="attachment-pill">
                       <span>{file.name}</span>
                       <span className="attachment-meta">{formatBytes(file.size)}</span>
+                      {file.note ? <span className="attachment-note">{file.note}</span> : null}
                     </div>
                   ))}
                 </div>

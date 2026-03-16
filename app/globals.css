@@ -193,6 +193,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   color: var(--muted);
   flex-shrink: 0;
 }
+.attachment-note {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
 .pending-attachments { margin-bottom: 4px; }
 .row { display: flex; gap: 12px; align-items: center; }
 .row.wrap { flex-wrap: wrap; }

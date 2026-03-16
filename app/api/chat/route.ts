@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { sendMessage } from '@/lib/openclaw';
 import { isAuthenticated } from '@/lib/auth';
-import { buildAttachmentContext, parseUploads } from '@/lib/uploads';
+import { buildAttachmentContext } from '@/lib/uploads';
+import type { ClientAttachment } from '@/lib/types';
 
 export async function POST(request: Request) {
   const authed = await isAuthenticated();
@@ -10,32 +11,22 @@ export async function POST(request: Request) {
   }
 
   try {
-    const contentType = request.headers.get('content-type') || '';
+    const body = await request.json().catch(() => ({}));
+    let message = typeof body.message === 'string' ? body.message : '';
+    const attachments = Array.isArray(body.attachments)
+      ? (body.attachments as ClientAttachment[])
+      : [];
 
-    let message = '';
-    let uploadedFiles: { name: string; size: number; type: string }[] = [];
+    const uploadedFiles = attachments.map((file) => ({
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      note: file.note,
+    }));
 
-    if (contentType.includes('multipart/form-data')) {
-      const form = await request.formData();
-      message = typeof form.get('message') === 'string' ? String(form.get('message')) : '';
-      const files = form
-        .getAll('files')
-        .filter((value): value is File => value instanceof File && value.size > 0);
-
-      const parsed = await parseUploads(files);
-      uploadedFiles = parsed.map((file) => ({
-        name: file.originalName,
-        size: file.size,
-        type: file.mimeType,
-      }));
-
-      const attachmentContext = buildAttachmentContext(parsed);
-      if (attachmentContext) {
-        message = `${message.trim()}\n\n${attachmentContext}`.trim();
-      }
-    } else {
-      const body = await request.json().catch(() => ({}));
-      message = typeof body.message === 'string' ? body.message : '';
+    const attachmentContext = buildAttachmentContext(attachments);
+    if (attachmentContext) {
+      message = `${message.trim()}\n\n${attachmentContext}`.trim();
     }
 
     if (!message.trim()) {
