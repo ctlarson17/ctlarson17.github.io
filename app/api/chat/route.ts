@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sendMessage } from '@/lib/openclaw';
 import { isAuthenticated } from '@/lib/auth';
-import { buildAttachmentContext, saveUploads } from '@/lib/uploads';
+import { buildAttachmentContext, parseUploads } from '@/lib/uploads';
 
 export async function POST(request: Request) {
   const authed = await isAuthenticated();
@@ -22,14 +22,14 @@ export async function POST(request: Request) {
         .getAll('files')
         .filter((value): value is File => value instanceof File && value.size > 0);
 
-      const saved = await saveUploads(files);
-      uploadedFiles = saved.map((file) => ({
+      const parsed = await parseUploads(files);
+      uploadedFiles = parsed.map((file) => ({
         name: file.originalName,
         size: file.size,
         type: file.mimeType,
       }));
 
-      const attachmentContext = buildAttachmentContext(saved);
+      const attachmentContext = buildAttachmentContext(parsed);
       if (attachmentContext) {
         message = `${message.trim()}\n\n${attachmentContext}`.trim();
       }
