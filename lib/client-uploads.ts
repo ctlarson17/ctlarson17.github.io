@@ -30,6 +30,18 @@ function isTextLike(file: File) {
   );
 }
 
+function fileToDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') resolve(reader.result);
+      else reject(new Error('Failed to read file as data URL'));
+    };
+    reader.onerror = () => reject(reader.error || new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function prepareClientAttachments(files: File[]): Promise<ClientAttachment[]> {
   return Promise.all(
     files.map(async (file) => {
@@ -42,7 +54,8 @@ export async function prepareClientAttachments(files: File[]): Promise<ClientAtt
       if (file.size > MAX_FILE_BYTES) {
         return {
           ...base,
-          note: `File too large to inline safely (${file.size} bytes). Upload a smaller excerpt.`,
+          kind: 'binary',
+          note: `File too large to process safely (${file.size} bytes). Upload a smaller file or excerpt.`,
         };
       }
 
@@ -50,6 +63,7 @@ export async function prepareClientAttachments(files: File[]): Promise<ClientAtt
         const text = await file.text();
         return {
           ...base,
+          kind: 'text',
           extractedText: text.slice(0, MAX_INLINE_TEXT_CHARS),
           note:
             text.length > MAX_INLINE_TEXT_CHARS
@@ -61,19 +75,22 @@ export async function prepareClientAttachments(files: File[]): Promise<ClientAtt
       if ((file.type || '').startsWith('image/')) {
         return {
           ...base,
-          note: 'Image attached. Image parsing is not wired into this stable upload path yet.',
+          kind: 'image',
+          dataUrl: await fileToDataUrl(file),
         };
       }
 
       if ((file.type || '').includes('pdf') || file.name.toLowerCase().endsWith('.pdf')) {
         return {
           ...base,
-          note: 'PDF attached. Direct PDF extraction is not wired into this stable upload path yet.',
+          kind: 'binary',
+          note: 'PDF attached. PDF extraction is not wired yet, but image uploads now use the real OpenClaw attachment path.',
         };
       }
 
       return {
         ...base,
+        kind: 'binary',
         note: 'Binary attachment noted, but this file type is not yet directly extractable here.',
       };
     }),

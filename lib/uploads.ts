@@ -1,11 +1,12 @@
 import type { ClientAttachment } from '@/lib/types';
 
 export function buildAttachmentContext(files: ClientAttachment[]) {
-  if (!files.length) return '';
+  const nonImageFiles = files.filter((file) => file.kind !== 'image');
+  if (!nonImageFiles.length) return '';
 
   const chunks: string[] = ['Attached files for this message:'];
 
-  for (const file of files) {
+  for (const file of nonImageFiles) {
     chunks.push(`- ${file.name} (${file.type}, ${file.size} bytes)`);
     if (file.note) chunks.push(`  Note: ${file.note}`);
     if (file.extractedText) {

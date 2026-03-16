@@ -7,6 +7,8 @@ export type UploadedFile = {
 
 export type ClientAttachment = UploadedFile & {
   extractedText?: string;
+  dataUrl?: string;
+  kind?: 'text' | 'image' | 'binary';
 };
 
 export type UiMessage = {

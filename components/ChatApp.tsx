@@ -5,34 +5,119 @@ import type { ClientAttachment, UiMessage, UploadedFile } from '@/lib/types';
 import { MarkdownMessage } from '@/components/MarkdownMessage';
 import { prepareClientAttachments } from '@/lib/client-uploads';
 
+const STORAGE_KEY = 'vince-chat-messages-v1';
+const MAX_LOCAL_MESSAGES = 150;
+
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function fallbackStarter(): UiMessage[] {
+  return [
+    {
+      id: 'welcome',
+      role: 'assistant',
+      content:
+        'Your private site is connected, but this conversation has no history yet. Say hi and we will start a fresh thread.',
+    },
+  ];
+}
+
+function sameMessage(a: UiMessage, b: UiMessage) {
+  return a.role === b.role && a.content === b.content;
+}
+
+function mergeMessages(base: UiMessage[], incoming: UiMessage[]) {
+  const merged = [...base];
+  for (const message of incoming) {
+    const exists = merged.some((entry) => entry.id === message.id || sameMessage(entry, message));
+    if (!exists) merged.push(message);
+  }
+  return merged.slice(-MAX_LOCAL_MESSAGES);
+}
+
 export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
-  const starter: UiMessage[] = initialMessages.length
-    ? initialMessages
-    : [
-        {
-          id: 'welcome',
-          role: 'assistant',
-          content: 'Your private site is connected, but this conversation has no history yet. Say hi and we will start a fresh thread.',
-        },
-      ];
+  const starter: UiMessage[] = initialMessages.length ? initialMessages : fallbackStarter();
 
   const [messages, setMessages] = useState<UiMessage[]>(starter);
   const [draft, setDraft] = useState('');
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
-  const status = useMemo(() => (loading ? 'Thinking…' : 'Ready'), [loading]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const status = useMemo(() => {
+    if (loading) return 'Thinking…';
+    if (historyLoading) return 'Syncing…';
+    return 'Ready';
+  }, [loading, historyLoading]);
   const endRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const hydratedRef = useRef(false);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages, loading]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || hydratedRef.current) return;
+    hydratedRef.current = true;
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as UiMessage[];
+      if (!Array.isArray(parsed) || parsed.length === 0) return;
+      setMessages((current) => mergeMessages(parsed, current));
+    } catch {
+      // ignore bad local cache
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-MAX_LOCAL_MESSAGES)));
+    } catch {
+      // ignore storage failures
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refreshHistory() {
+      setHistoryLoading(true);
+      try {
+        const res = await fetch('/api/history', { cache: 'no-store' });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'History request failed');
+        if (cancelled) return;
+        const nextMessages = Array.isArray(json.messages) && json.messages.length ? json.messages : fallbackStarter();
+        setMessages((current) => mergeMessages(current, nextMessages));
+      } catch {
+        // keep local view if remote history fetch fails
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
+      }
+    }
+
+    void refreshHistory();
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        void refreshHistory();
+      }
+    };
+
+    window.addEventListener('focus', refreshHistory);
+    document.addEventListener('visibilitychange', onVisible);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', refreshHistory);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, []);
 
   async function submit() {
     const text = draft.trim();
@@ -53,7 +138,7 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
       uploads,
     };
 
-    setMessages((current) => [...current, userMessage]);
+    setMessages((current) => [...current, userMessage].slice(-MAX_LOCAL_MESSAGES));
     setDraft('');
     setPendingFiles([]);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -71,17 +156,17 @@ export function ChatApp({ initialMessages }: { initialMessages: UiMessage[] }) {
 
       setMessages((current) => [
         ...current,
-        { id: crypto.randomUUID(), role: 'assistant', content: json.reply },
-      ]);
+        { id: crypto.randomUUID(), role: 'assistant' as const, content: String(json.reply) },
+      ].slice(-MAX_LOCAL_MESSAGES));
     } catch (error) {
       setMessages((current) => [
         ...current,
         {
           id: crypto.randomUUID(),
-          role: 'system',
+          role: 'system' as const,
           content: error instanceof Error ? error.message : 'Something went wrong.',
         },
-      ]);
+      ].slice(-MAX_LOCAL_MESSAGES));
     } finally {
       setLoading(false);
     }
