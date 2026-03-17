@@ -50,8 +50,10 @@ function mergeMessages(base: UiMessage[], incoming: UiMessage[]) {
 
 export function ChatApp({
   initialMessages,
+  appVersion,
 }: {
   initialMessages: UiMessage[];
+  appVersion: string;
 }) {
   const starter: UiMessage[] = initialMessages.length ? initialMessages : fallbackStarter();
 
