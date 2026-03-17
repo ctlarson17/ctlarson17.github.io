@@ -71,6 +71,19 @@ export function ChatApp({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const hydratedRef = useRef(false);
 
+  function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const items = Array.from(event.clipboardData?.items || []);
+    const pastedFiles = items
+      .filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
+      .map((item, index) => makePastedFile(item, index))
+      .filter((file): file is File => Boolean(file));
+
+    if (!pastedFiles.length) return;
+
+    event.preventDefault();
+    setPendingFiles((current) => [...current, ...pastedFiles]);
+  }
+
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages, loading]);
