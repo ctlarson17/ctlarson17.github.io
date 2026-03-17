@@ -52,7 +52,6 @@ export function ChatApp({
   initialMessages,
 }: {
   initialMessages: UiMessage[];
-  browserGatewayConfig: { gatewayHttpUrl: string; gatewayToken: string; sessionKey: string };
 }) {
   const starter: UiMessage[] = initialMessages.length ? initialMessages : fallbackStarter();
 
