@@ -235,7 +235,7 @@ export function ChatApp({
         <div className="header">
           <div>
             <h2>Chat</h2>
-            <div className="small">Latest messages stay pinned above the composer.</div>
+            <div className="small code">{appVersion}</div>
           </div>
         </div>
 
@@ -299,6 +299,12 @@ export function ChatApp({
               {loading ? 'Sending…' : 'Send'}
             </button>
           </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+         </div>
         </div>
       </section>
     </div>
