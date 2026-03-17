@@ -3,6 +3,7 @@ export type UploadedFile = {
   size: number;
   type: string;
   note?: string;
+  path?: string;
 };
 
 export type ClientAttachment = UploadedFile & {

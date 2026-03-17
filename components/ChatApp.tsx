@@ -4,8 +4,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ClientAttachment, UiMessage, UploadedFile } from '@/lib/types';
 import { MarkdownMessage } from '@/components/MarkdownMessage';
 import { prepareClientAttachments } from '@/lib/client-uploads';
-import { sendMessageViaBrowserGateway } from '@/lib/openclaw-browser';
 import { formatUserFacingError, normalizeMessageContent } from '@/lib/error-format';
+import { uploadAssets } from '@/lib/upload-assets';
 
 const STORAGE_KEY = 'vince-chat-messages-v1';
 const MAX_LOCAL_MESSAGES = 150;
@@ -48,18 +48,11 @@ function mergeMessages(base: UiMessage[], incoming: UiMessage[]) {
   return merged.slice(-MAX_LOCAL_MESSAGES);
 }
 
-type BrowserGatewayConfig = {
-  gatewayHttpUrl: string;
-  gatewayToken: string;
-  sessionKey: string;
-};
-
 export function ChatApp({
   initialMessages,
-  browserGatewayConfig,
 }: {
   initialMessages: UiMessage[];
-  browserGatewayConfig: BrowserGatewayConfig;
+  browserGatewayConfig: { gatewayHttpUrl: string; gatewayToken: string; sessionKey: string };
 }) {
   const starter: UiMessage[] = initialMessages.length ? initialMessages : fallbackStarter();
 
@@ -170,21 +163,28 @@ export function ChatApp({
     setLoading(true);
 
     try {
-      const hasImageAttachment = attachments.some((attachment) => attachment.kind === 'image' && attachment.dataUrl);
-
-      if (hasImageAttachment && browserGatewayConfig.gatewayHttpUrl && browserGatewayConfig.gatewayToken) {
-        const reply = await sendMessageViaBrowserGateway(text, attachments, browserGatewayConfig);
-        setMessages((current) => [
-          ...current,
-          { id: crypto.randomUUID(), role: 'assistant' as const, content: reply },
-        ].slice(-MAX_LOCAL_MESSAGES));
-        return;
-      }
+      const uploadedAssets = pendingFiles.length ? await uploadAssets(pendingFiles) : [];
+      const mergedUploads: UploadedFile[] = [
+        ...uploads,
+        ...uploadedAssets.map((file) => ({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          path: file.path,
+          note: file.path,
+        })),
+      ];
+      setMessages((current) => {
+        const next = [...current];
+        const last = next[next.length - 1];
+        if (last?.id === userMessage.id) last.uploads = mergedUploads;
+        return next.slice(-MAX_LOCAL_MESSAGES);
+      });
 
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, attachments }),
+        body: JSON.stringify({ message: text, attachments, uploadedAssets }),
       });
 
       const json = await res.json();
