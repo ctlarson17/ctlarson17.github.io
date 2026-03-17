@@ -142,13 +142,23 @@ export function ChatApp({
     const text = draft.trim();
     if ((!text && pendingFiles.length === 0) || loading) return;
 
+    const uploadedAssets = pendingFiles.length ? await uploadAssets(pendingFiles) : [];
     const attachments: ClientAttachment[] = await prepareClientAttachments(pendingFiles);
-    const uploads: UploadedFile[] = attachments.map((file) => ({
-      name: file.name,
-      size: file.size,
-      type: file.type || 'application/octet-stream',
-      note: file.note,
-    }));
+    const uploads: UploadedFile[] = [
+      ...attachments.map((file) => ({
+        name: file.name,
+        size: file.size,
+        type: file.type || 'application/octet-stream',
+        note: file.note,
+      })),
+      ...uploadedAssets.map((file) => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        path: file.path,
+        note: file.path,
+      })),
+    ];
 
     const userMessage: UiMessage = {
       id: crypto.randomUUID(),
