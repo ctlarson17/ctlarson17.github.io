@@ -16,14 +16,35 @@ function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function makePastedFile(item: DataTransferItem, index: number) {
-  const file = item.getAsFile();
-  if (!file) return null;
+function normalizePastedFile(file: File, index: number) {
   const ext = file.type.split('/')[1] || 'png';
   const name = file.name && file.name !== 'image.png'
     ? file.name
     : `pasted-image-${Date.now()}-${index}.${ext}`;
   return new File([file], name, { type: file.type || 'image/png' });
+}
+
+function extractPastedImageFiles(data: DataTransfer | null) {
+  if (!data) return [];
+
+  const fromItems = Array.from(data.items || [])
+    .filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
+    .map((item, index) => item.getAsFile())
+    .filter((file): file is File => Boolean(file))
+    .map((file, index) => normalizePastedFile(file, index));
+
+  const fromFiles = Array.from(data.files || [])
+    .filter((file) => file.type.startsWith('image/'))
+    .map((file, index) => normalizePastedFile(file, index));
+
+  const merged = [...fromItems, ...fromFiles];
+  const seen = new Set<string>();
+  return merged.filter((file) => {
+    const key = `${file.name}:${file.size}:${file.type}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function fallbackStarter(): UiMessage[] {
@@ -82,15 +103,16 @@ export function ChatApp({
   const hydratedRef = useRef(false);
 
   function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
-    const items = Array.from(event.clipboardData?.items || []);
-    const pastedFiles = items
-      .filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
-      .map((item, index) => makePastedFile(item, index))
-      .filter((file): file is File => Boolean(file));
+    const pastedFiles = extractPastedImageFiles(event.clipboardData);
 
-    if (!pastedFiles.length) return;
+    if (!pastedFiles.length) {
+      const itemTypes = Array.from(event.clipboardData?.items || []).map((item) => `${item.kind}:${item.type}`);
+      console.log('[vince-paste] no image found in paste', { itemTypes, fileCount: event.clipboardData?.files?.length || 0 });
+      return;
+    }
 
     event.preventDefault();
+    console.log('[vince-paste] captured image paste', pastedFiles.map((file) => ({ name: file.name, type: file.type, size: file.size })));
     setPendingFiles((current) => [...current, ...pastedFiles]);
   }
 
@@ -276,7 +298,16 @@ export function ChatApp({
           <div ref={endRef} />
         </div>
 
-        <div className="composer sticky-composer">
+        <div
+          className="composer sticky-composer"
+          onPaste={(event) => {
+            const pastedFiles = extractPastedImageFiles(event.clipboardData);
+            if (!pastedFiles.length) return;
+            event.preventDefault();
+            console.log('[vince-paste] composer-level paste capture', pastedFiles.map((file) => ({ name: file.name, type: file.type, size: file.size })));
+            setPendingFiles((current) => [...current, ...pastedFiles]);
+          }}
+        >
           <input
             ref={fileInputRef}
             className="file-input"
@@ -310,7 +341,7 @@ export function ChatApp({
             <button className="btn secondary" type="button" onClick={() => fileInputRef.current?.click()} disabled={loading}>
               Attach files
             </button>
-            <div className="small">⌘/Ctrl + Enter to send</div>
+            <div className="small">⌘/Ctrl + Enter to send · paste images into the composer or textarea</div>
             <div className="spacer" />
             <button className="btn" onClick={() => void submit()} disabled={loading || (!draft.trim() && pendingFiles.length === 0)}>
               {loading ? 'Sending…' : 'Send'}
