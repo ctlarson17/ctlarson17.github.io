@@ -164,24 +164,6 @@ export function ChatApp({
     setLoading(true);
 
     try {
-      const uploadedAssets = pendingFiles.length ? await uploadAssets(pendingFiles) : [];
-      const mergedUploads: UploadedFile[] = [
-        ...uploads,
-        ...uploadedAssets.map((file) => ({
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          path: file.path,
-          note: file.path,
-        })),
-      ];
-      setMessages((current) => {
-        const next = [...current];
-        const last = next[next.length - 1];
-        if (last?.id === userMessage.id) last.uploads = mergedUploads;
-        return next.slice(-MAX_LOCAL_MESSAGES);
-      });
-
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -283,6 +265,30 @@ export function ChatApp({
             className="textarea"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
+            placeholder="Message Vince…"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                void submit();
+              }
+            }}
+          />
+          <div className="row wrap">
+            <button className="btn secondary" type="button" onClick={() => fileInputRef.current?.click()} disabled={loading}>
+              Attach files
+            </button>
+            <div className="small">⌘/Ctrl + Enter to send</div>
+            <div className="spacer" />
+            <button className="btn" onClick={() => void submit()} disabled={loading || (!draft.trim() && pendingFiles.length === 0)}>
+              {loading ? 'Sending…' : 'Send'}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+       onChange={(e) => setDraft(e.target.value)}
             placeholder="Message Vince…"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {

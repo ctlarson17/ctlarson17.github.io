@@ -30,18 +30,6 @@ function isTextLike(file: File) {
   );
 }
 
-function fileToDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') resolve(reader.result);
-      else reject(new Error('Failed to read file as data URL'));
-    };
-    reader.onerror = () => reject(reader.error || new Error('Failed to read file'));
-    reader.readAsDataURL(file);
-  });
-}
-
 export async function prepareClientAttachments(files: File[]): Promise<ClientAttachment[]> {
   return Promise.all(
     files.map(async (file) => {
@@ -85,6 +73,22 @@ export async function prepareClientAttachments(files: File[]): Promise<ClientAtt
           ...base,
           kind: 'binary',
           note: 'PDF attached. PDF extraction is not wired yet, but image uploads now use the real OpenClaw attachment path.',
+        };
+      }
+
+      return {
+        ...base,
+        kind: 'binary',
+        note: 'Binary attachment noted, but this file type is not yet directly extractable here.',
+      };
+    }),
+  );
+}
+s('pdf') || file.name.toLowerCase().endsWith('.pdf')) {
+        return {
+          ...base,
+          kind: 'binary',
+          note: 'PDF attached. Direct PDF extraction is not wired yet.',
         };
       }
 
