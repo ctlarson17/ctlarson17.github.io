@@ -2,6 +2,7 @@ import { ChatApp } from '@/components/ChatApp';
 import { LoginForm } from '@/components/LoginForm';
 import { isAuthenticated } from '@/lib/auth';
 import { fetchHistory } from '@/lib/openclaw';
+import pkg from '@/package.json';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
