@@ -304,9 +304,3 @@ export function ChatApp({
     </div>
   );
 }
-         </div>
-        </div>
-      </section>
-    </div>
-  );
-}
