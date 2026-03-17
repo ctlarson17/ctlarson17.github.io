@@ -16,6 +16,16 @@ function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function makePastedFile(item: DataTransferItem, index: number) {
+  const file = item.getAsFile();
+  if (!file) return null;
+  const ext = file.type.split('/')[1] || 'png';
+  const name = file.name && file.name !== 'image.png'
+    ? file.name
+    : `pasted-image-${Date.now()}-${index}.${ext}`;
+  return new File([file], name, { type: file.type || 'image/png' });
+}
+
 function fallbackStarter(): UiMessage[] {
   return [
     {
