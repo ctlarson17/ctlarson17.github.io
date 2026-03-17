@@ -64,27 +64,11 @@ export async function prepareClientAttachments(files: File[]): Promise<ClientAtt
         return {
           ...base,
           kind: 'image',
-          dataUrl: await fileToDataUrl(file),
+          note: 'Image uploaded to the host for direct inspection.',
         };
       }
 
       if ((file.type || '').includes('pdf') || file.name.toLowerCase().endsWith('.pdf')) {
-        return {
-          ...base,
-          kind: 'binary',
-          note: 'PDF attached. PDF extraction is not wired yet, but image uploads now use the real OpenClaw attachment path.',
-        };
-      }
-
-      return {
-        ...base,
-        kind: 'binary',
-        note: 'Binary attachment noted, but this file type is not yet directly extractable here.',
-      };
-    }),
-  );
-}
-s('pdf') || file.name.toLowerCase().endsWith('.pdf')) {
         return {
           ...base,
           kind: 'binary',

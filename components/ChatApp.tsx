@@ -288,27 +288,3 @@ export function ChatApp({
     </div>
   );
 }
-       onChange={(e) => setDraft(e.target.value)}
-            placeholder="Message Vince…"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                void submit();
-              }
-            }}
-          />
-          <div className="row wrap">
-            <button className="btn secondary" type="button" onClick={() => fileInputRef.current?.click()} disabled={loading}>
-              Attach files
-            </button>
-            <div className="small">⌘/Ctrl + Enter to send</div>
-            <div className="spacer" />
-            <button className="btn" onClick={() => void submit()} disabled={loading || (!draft.trim() && pendingFiles.length === 0)}>
-              {loading ? 'Sending…' : 'Send'}
-            </button>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
