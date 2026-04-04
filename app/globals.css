@@ -96,6 +96,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 }
 .btn:disabled { opacity: .6; cursor: not-allowed; }
 .error { color: var(--danger); }
+select.input {
+  appearance: none;
+  -webkit-appearance: none;
+}
 
 .chat-shell { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 88vh; overflow: hidden; }
 .sidebar {
@@ -229,6 +233,110 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   background: rgba(218, 165, 32, 0.08);
 }
 
+.civic-shell {
+  width: min(1180px, 100%);
+  min-height: 88vh;
+  padding: 28px;
+  display: grid;
+  gap: 22px;
+}
+.civic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.civic-header h1 {
+  margin: 4px 0 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+.civic-intro {
+  max-width: 720px;
+  line-height: 1.6;
+  margin: 10px 0 0;
+}
+.civic-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: end;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015));
+}
+.compact-field {
+  margin-top: 0;
+  min-width: 220px;
+}
+.civic-stat {
+  margin-left: auto;
+}
+.civic-list {
+  display: grid;
+  gap: 16px;
+}
+.civic-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.012));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.civic-card h2 {
+  margin: 10px 0 12px;
+  font-size: 1.3rem;
+}
+.civic-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.civic-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(240, 196, 102, 0.22);
+  background: rgba(240, 196, 102, 0.1);
+  color: var(--accent-2);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+.muted-badge {
+  color: var(--muted);
+  background: rgba(255,255,255,.05);
+  border-color: var(--border);
+}
+.civic-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.area-tag {
+  background: rgba(240, 196, 102, 0.08);
+  border-color: rgba(240, 196, 102, 0.18);
+}
+.civic-actions {
+  margin-top: 16px;
+}
+.civic-empty {
+  padding: 28px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 16px;
+}
+
 @media (max-width: 860px) {
   .page-shell { padding: 0; }
   .card { width: 100%; min-width: 0; border-radius: 0; border-left: 0; border-right: 0; box-shadow: none; }
@@ -241,4 +349,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   .messages { padding: 16px; padding-bottom: 12px; }
   .composer { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); }
   .textarea { min-height: 72px; max-height: 30vh; }
+  .civic-shell { min-height: 100vh; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); }
+  .civic-header { flex-direction: column; }
+  .civic-toolbar { padding: 14px; }
+  .compact-field { min-width: 100%; }
+  .civic-stat { margin-left: 0; }
 }

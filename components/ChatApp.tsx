@@ -264,6 +264,7 @@ export function ChatApp({
         </div>
 
         <div className="sidebar-section">
+          <a className="btn secondary" href="/civic-watch">Open Civic Watch</a>
           <form action="/api/logout" method="post">
             <button className="btn secondary" type="submit">Log out</button>
           </form>
