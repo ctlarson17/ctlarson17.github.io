@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>calebtlarson.com</title>
+    <meta name="description" content="Personal site coming soon." />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #111111;
+        --card: #1a1a1a;
+        --text: #f5f5f5;
+        --muted: #b8b8b8;
+        --accent: #c58b63;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at top, #1c1c1c, var(--bg) 55%);
+        color: var(--text);
+      }
+      main {
+        width: min(92vw, 640px);
+        padding: 40px 32px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 24px;
+        background: rgba(26,26,26,0.9);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      }
+      .eyebrow {
+        margin: 0 0 14px;
+        color: var(--accent);
+        font-size: 0.9rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        line-height: 1.05;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">calebtlarson.com</p>
+      <h1>Site coming soon</h1>
+      <p>A cleaner public home is on the way. Please check back soon.</p>
+    </main>
+  </body>
+</html>
