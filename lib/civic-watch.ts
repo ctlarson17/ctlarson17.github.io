@@ -1,6 +1,33 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
+export type CivicWatchTopicWindow = {
+  start_seconds: number;
+  end_seconds: number;
+  start: string;
+  end: string;
+  duration_seconds: number;
+  video_url?: string;
+  snippet: string;
+};
+
+export type CivicWatchTopic = {
+  tag: string;
+  kind: 'issue' | 'area' | string;
+  mention_count: number;
+  window_count: number;
+  total_seconds: number;
+  total_minutes: number;
+  first_seen: string;
+  last_seen: string;
+  representative_snippets: CivicWatchTopicWindow[];
+  summary: string;
+  decision_signals?: boolean;
+  upcoming_signals?: boolean;
+  position_signals?: boolean;
+  windows?: CivicWatchTopicWindow[];
+};
+
 export type CivicWatchMeeting = {
   video_id: string;
   title: string;
@@ -8,6 +35,7 @@ export type CivicWatchMeeting = {
   url: string;
   issue_hits: string[];
   area_hits: string[];
+  topics?: CivicWatchTopic[];
   prototype?: boolean;
 };
 
