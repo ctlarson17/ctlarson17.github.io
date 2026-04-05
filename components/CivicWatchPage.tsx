@@ -5,6 +5,7 @@ import type { CivicWatchMeeting, CivicWatchTopic } from '@/lib/civic-watch';
 
 type Props = {
   meetings: CivicWatchMeeting[];
+  appVersion: string;
 };
 
 function slugBody(title: string) {
@@ -71,7 +72,7 @@ function TopicCard({ topic, active, onToggle }: { topic: CivicWatchTopic; active
   );
 }
 
-export function CivicWatchPage({ meetings }: Props) {
+export function CivicWatchPage({ meetings, appVersion }: Props) {
   const [bodyFilter, setBodyFilter] = useState<string>('All');
   const [tagFilter, setTagFilter] = useState<string>('All');
   const [selectedTopicKey, setSelectedTopicKey] = useState<string | null>(null);
@@ -94,7 +95,10 @@ export function CivicWatchPage({ meetings }: Props) {
     <div className="card civic-shell">
       <div className="civic-header">
         <div>
-          <div className="small">🌊 Civic Watch</div>
+          <div className="small civic-kicker-row">
+            <span>🌊 Civic Watch</span>
+            <span className="version-pill code">{appVersion}</span>
+          </div>
           <h1>Salt Lake civic watchdog</h1>
           <p className="muted civic-intro">
             A running archive of City Council and Planning Commission meetings, published from Vince&apos;s local watchdog pipeline.

@@ -250,6 +250,21 @@ select.input {
   margin: 4px 0 0;
   font-size: clamp(2rem, 5vw, 3rem);
 }
+.civic-kicker-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.version-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.05);
+  color: var(--text);
+}
 .civic-intro {
   max-width: 720px;
   line-height: 1.6;
