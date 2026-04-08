@@ -17,4 +17,5 @@ export type UiMessage = {
   role: 'user' | 'assistant' | 'system';
   content: string;
   uploads?: UploadedFile[];
+  timestamp?: number;
 };

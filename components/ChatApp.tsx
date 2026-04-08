@@ -9,6 +9,7 @@ import { uploadAssets } from '@/lib/upload-assets';
 
 const STORAGE_KEY = 'vince-chat-messages-v1';
 const MAX_LOCAL_MESSAGES = 150;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -54,6 +55,7 @@ function fallbackStarter(): UiMessage[] {
       role: 'assistant',
       content:
         'Your private site is connected, but this conversation has no history yet. Say hi and we will start a fresh thread.',
+      timestamp: Date.now(),
     },
   ];
 }
@@ -62,6 +64,7 @@ function sanitizeMessage(message: UiMessage): UiMessage {
   return {
     ...message,
     content: normalizeMessageContent(message.content),
+    timestamp: typeof message.timestamp === 'number' ? message.timestamp : undefined,
   };
 }
 
@@ -76,7 +79,88 @@ function mergeMessages(base: UiMessage[], incoming: UiMessage[]) {
     const exists = merged.some((entry) => entry.id === message.id || sameMessage(entry, message));
     if (!exists) merged.push(message);
   }
-  return merged.slice(-MAX_LOCAL_MESSAGES);
+  return merged
+    .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+    .slice(-MAX_LOCAL_MESSAGES);
+}
+
+function getDayKey(timestamp?: number) {
+  if (!timestamp) return 'unknown';
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getRelativeDayLabel(timestamp: number) {
+  const target = new Date(timestamp);
+  const now = new Date();
+  const targetStart = new Date(target.getFullYear(), target.getMonth(), target.getDate()).getTime();
+  const nowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const diffDays = Math.round((targetStart - nowStart) / DAY_MS);
+
+  if (diffDays === 0) return 'Today';
+  if (diffDays === -1) return 'Yesterday';
+  if (diffDays === 1) return 'Tomorrow';
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(target);
+}
+
+function getCollapsedDayLabel(timestamp?: number) {
+  if (!timestamp) return 'Unknown date';
+  return getRelativeDayLabel(timestamp);
+}
+
+function getVisibleDateLabel(timestamp?: number) {
+  if (!timestamp) return 'Unknown date';
+  const date = new Date(timestamp);
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+}
+
+function getMessageTimeLabel(timestamp?: number) {
+  if (!timestamp) return '';
+  return new Intl.DateTimeFormat(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(timestamp));
+}
+
+type MessageDayGroup = {
+  key: string;
+  timestamp?: number;
+  messages: UiMessage[];
+};
+
+function groupMessagesByDay(messages: UiMessage[]): MessageDayGroup[] {
+  const groups: MessageDayGroup[] = [];
+
+  for (const message of messages) {
+    const key = getDayKey(message.timestamp);
+    const last = groups[groups.length - 1];
+    if (last && last.key === key) {
+      last.messages.push(message);
+      if (!last.timestamp && message.timestamp) last.timestamp = message.timestamp;
+      continue;
+    }
+
+    groups.push({
+      key,
+      timestamp: message.timestamp,
+      messages: [message],
+    });
+  }
+
+  return groups;
 }
 
 export function ChatApp({
@@ -93,6 +177,7 @@ export function ChatApp({
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [expandedDays, setExpandedDays] = useState<string[]>([]);
   const status = useMemo(() => {
     if (loading) return 'Thinking…';
     if (historyLoading) return 'Syncing…';
@@ -101,6 +186,17 @@ export function ChatApp({
   const endRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const hydratedRef = useRef(false);
+
+  const dayGroups = useMemo(() => groupMessagesByDay(messages), [messages]);
+  const latestDayKey = dayGroups[dayGroups.length - 1]?.key;
+  const visibleDayGroups = useMemo(
+    () => dayGroups.filter((group) => group.key === latestDayKey || expandedDays.includes(group.key)),
+    [dayGroups, expandedDays, latestDayKey],
+  );
+  const hiddenDayGroups = useMemo(
+    () => dayGroups.filter((group) => group.key !== latestDayKey && !expandedDays.includes(group.key)),
+    [dayGroups, expandedDays, latestDayKey],
+  );
 
   function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
     const pastedFiles = extractPastedImageFiles(event.clipboardData);
@@ -145,6 +241,11 @@ export function ChatApp({
       // ignore storage failures
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (!latestDayKey) return;
+    setExpandedDays((current) => current.filter((key) => key !== latestDayKey));
+  }, [latestDayKey]);
 
   useEffect(() => {
     let cancelled = false;
@@ -205,11 +306,13 @@ export function ChatApp({
       })),
     ];
 
+    const now = Date.now();
     const userMessage: UiMessage = {
       id: crypto.randomUUID(),
       role: 'user',
       content: text || 'Attached files',
       uploads,
+      timestamp: now,
     };
 
     setMessages((current) => [...current, userMessage].slice(-MAX_LOCAL_MESSAGES));
@@ -230,7 +333,7 @@ export function ChatApp({
 
       setMessages((current) => [
         ...current,
-        { id: crypto.randomUUID(), role: 'assistant' as const, content: String(json.reply) },
+        { id: crypto.randomUUID(), role: 'assistant' as const, content: String(json.reply), timestamp: Date.now() },
       ].slice(-MAX_LOCAL_MESSAGES));
     } catch (error) {
       console.error('[vince-image] submit failure', error);
@@ -240,6 +343,7 @@ export function ChatApp({
           id: crypto.randomUUID(),
           role: 'system' as const,
           content: formatUserFacingError(error),
+          timestamp: Date.now(),
         },
       ].slice(-MAX_LOCAL_MESSAGES));
     } finally {
@@ -280,20 +384,46 @@ export function ChatApp({
         </div>
 
         <div className="messages">
-          {messages.map((message) => (
-            <div key={message.id} className={`message ${message.role}`}>
-              <MarkdownMessage content={message.content} />
-              {message.uploads?.length ? (
-                <div className="attachments">
-                  {message.uploads.map((file) => (
-                    <div key={`${message.id}-${file.name}-${file.size}`} className="attachment-pill">
-                      <span>{file.name}</span>
-                      <span className="attachment-meta">{formatBytes(file.size)}</span>
-                      {file.note ? <span className="attachment-note">{file.note}</span> : null}
-                    </div>
-                  ))}
+          {hiddenDayGroups.length ? (
+            <div className="day-toggle-stack">
+              {hiddenDayGroups.map((group) => (
+                <button
+                  key={`show-${group.key}`}
+                  type="button"
+                  className="day-toggle"
+                  onClick={() => setExpandedDays((current) => [...current, group.key])}
+                >
+                  <span>Show messages from {getCollapsedDayLabel(group.timestamp)}</span>
+                  <span className="day-toggle-count">{group.messages.length}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {visibleDayGroups.map((group) => (
+            <div key={group.key} className="day-group">
+              <div className="day-divider">
+                <span>{getVisibleDateLabel(group.timestamp)}</span>
+              </div>
+              {group.messages.map((message) => (
+                <div key={message.id} className={`message-wrap ${message.role}`}>
+                  <div className={`message ${message.role}`}>
+                    <MarkdownMessage content={message.content} />
+                    {message.uploads?.length ? (
+                      <div className="attachments">
+                        {message.uploads.map((file) => (
+                          <div key={`${message.id}-${file.name}-${file.size}`} className="attachment-pill">
+                            <span>{file.name}</span>
+                            <span className="attachment-meta">{formatBytes(file.size)}</span>
+                            {file.note ? <span className="attachment-note">{file.note}</span> : null}
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                  {message.timestamp ? <div className={`message-time ${message.role}`}>{getMessageTimeLabel(message.timestamp)}</div> : null}
                 </div>
-              ) : null}
+              ))}
             </div>
           ))}
           <div ref={endRef} />
@@ -331,6 +461,7 @@ export function ChatApp({
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Message Vince…"
+            onPaste={handlePaste}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();

@@ -135,6 +135,17 @@ select.input {
   max-height: calc(88vh - 180px);
   background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0));
 }
+.message-wrap {
+  display: grid;
+  gap: 6px;
+}
+.message-wrap.user {
+  justify-items: end;
+}
+.message-wrap.assistant,
+.message-wrap.system {
+  justify-items: start;
+}
 .message {
   width: fit-content;
   max-width: min(780px, 100%);
@@ -157,6 +168,61 @@ select.input {
 .message.system {
   background: rgba(255,206,112,.08);
   color: #ffe2a8;
+}
+.message-time {
+  font-size: 0.78rem;
+  color: var(--muted);
+  padding: 0 6px;
+}
+.day-toggle-stack {
+  display: grid;
+  gap: 10px;
+}
+.day-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+}
+.day-toggle:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: var(--border-strong);
+}
+.day-toggle-count {
+  flex: 0 0 auto;
+  min-width: 28px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(240, 196, 102, 0.12);
+  color: var(--accent-2);
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.day-group {
+  display: grid;
+  gap: 18px;
+}
+.day-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px 0;
+}
+.day-divider span {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  color: var(--muted);
+  font-size: 0.84rem;
+  letter-spacing: 0.01em;
 }
 .composer {
   border-top: 1px solid var(--border);
