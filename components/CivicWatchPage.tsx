@@ -32,6 +32,42 @@ function formatTopicLabel(tag: string) {
   return tag.replace(/-/g, ' ');
 }
 
+function cleanSnippetDetail(text?: string) {
+  if (!text) return '';
+
+  return text
+    .replace(/^\W+/, '')
+    .replace(/\s+/g, ' ')
+    .replace(/\b(?:so|and|but|well|now|okay)\b[,:]?\s+/i, '')
+    .replace(/^(?:we are going to|we're going to|we will|they will)\s+/i, '')
+    .replace(/^(?:the )?(?:item|agenda item) number\s+\w+[,:-]?\s*/i, '')
+    .replace(/^i\s+i\s+/i, 'I ')
+    .trim()
+    .replace(/[|]+/g, ' ')
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .replace(/\s+/g, ' ')
+    .replace(/[.]+$/g, '');
+}
+
+function topicDetailLine(topic: CivicWatchTopic) {
+  const snippet = cleanSnippetDetail(topic.representative_snippets?.[0]?.snippet);
+  if (!snippet) return '';
+
+  const lowerTag = formatTopicLabel(topic.tag).toLowerCase();
+  const lowerSnippet = snippet.toLowerCase();
+  if (lowerSnippet.startsWith(lowerTag)) {
+    return snippet;
+  }
+
+  return `${formatTopicLabel(topic.tag)}: ${snippet}`;
+}
+
+function joinList(parts: string[]) {
+  if (parts.length <= 1) return parts[0] || '';
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+  return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
+}
+
 function buildMeetingSummary(meeting: CivicWatchMeeting, topics: CivicWatchTopic[]) {
   if (!topics.length) {
     return 'Transcript analysis is still thin here, so this meeting does not have a reliable high-level summary yet.';
@@ -39,17 +75,34 @@ function buildMeetingSummary(meeting: CivicWatchMeeting, topics: CivicWatchTopic
 
   const topTopics = topics.slice(0, 3);
   const topicBits = topTopics.map((topic) => `${formatTopicLabel(topic.tag)} (${topic.total_minutes} min)`);
-  const lead = `This ${slugBody(meeting.title).toLowerCase()} meeting was mainly about ${topicBits.join(', ')}.`;
+  const lead = `This ${slugBody(meeting.title).toLowerCase()} meeting was mainly about ${joinList(topicBits)}.`;
 
-  const decisionTopics = topics.filter((topic) => topic.decision_signals).slice(0, 2).map((topic) => formatTopicLabel(topic.tag));
-  const upcomingTopics = topics.filter((topic) => topic.upcoming_signals).slice(0, 2).map((topic) => formatTopicLabel(topic.tag));
+  const concreteDetails = topTopics
+    .map((topic) => topicDetailLine(topic))
+    .filter(Boolean)
+    .slice(0, 2);
 
   const tail: string[] = [];
-  if (decisionTopics.length) {
-    tail.push(`Decision-like language showed up around ${decisionTopics.join(' and ')}.`);
+  if (concreteDetails.length) {
+    tail.push(`Most of the concrete discussion was about ${concreteDetails.join(' — ')}.`);
   }
-  if (upcomingTopics.length) {
-    tail.push(`Possible follow-up or next-step signals appeared around ${upcomingTopics.join(' and ')}.`);
+
+  const decisionDetails = topics
+    .filter((topic) => topic.decision_signals)
+    .map((topic) => topicDetailLine(topic))
+    .filter(Boolean)
+    .slice(0, 1);
+  if (decisionDetails.length) {
+    tail.push(`Decision-related language showed up around ${decisionDetails[0]}.`);
+  }
+
+  const upcomingDetails = topics
+    .filter((topic) => topic.upcoming_signals)
+    .map((topic) => topicDetailLine(topic))
+    .filter(Boolean)
+    .slice(0, 1);
+  if (upcomingDetails.length) {
+    tail.push(`Possible next steps or follow-up came up around ${upcomingDetails[0]}.`);
   }
 
   return [lead, ...tail].join(' ');
