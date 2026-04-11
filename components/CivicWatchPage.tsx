@@ -121,6 +121,7 @@ function TopicChart({ topics, onSelect }: TopicChartProps) {
             key={topic.tag}
             className="topic-chart-row"
             onClick={() => onSelect(topic.tag)}
+            aria-label={`Open ${formatTopicLabel(topic.tag)} details`}
           >
             <span className="topic-chart-label">{formatTopicLabel(topic.tag)}</span>
             <span className="topic-chart-bar-wrap">
@@ -137,7 +138,7 @@ function TopicChart({ topics, onSelect }: TopicChartProps) {
 function TopicCard({ topic, active, onToggle }: { topic: CivicWatchTopic; active: boolean; onToggle: () => void }) {
   return (
     <div className={`topic-card ${active ? 'active' : ''}`}>
-      <button type="button" className="topic-toggle" onClick={onToggle}>
+      <button type="button" className="topic-toggle" onClick={onToggle} aria-expanded={active}>
         <div className="topic-toggle-main">
           <span className={`topic-kind ${topic.kind === 'area' ? 'area-kind' : ''}`}>{topic.kind}</span>
           <strong>{topic.tag}</strong>
@@ -270,6 +271,7 @@ export function CivicWatchPage({ meetings, appVersion }: Props) {
                             key={`${meeting.video_id}-${topic.tag}`}
                             className="topic-glance"
                             onClick={() => setSelectedTopicKey(`${meeting.video_id}:${topic.tag}`)}
+                            aria-label={`Open ${formatTopicLabel(topic.tag)} details`}
                           >
                             <span>{formatTopicLabel(topic.tag)}</span>
                             <strong>{topic.total_minutes} min</strong>
