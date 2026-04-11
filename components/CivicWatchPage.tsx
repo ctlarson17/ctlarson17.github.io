@@ -8,6 +8,11 @@ type Props = {
   appVersion: string;
 };
 
+type TopicChartProps = {
+  topics: CivicWatchTopic[];
+  onSelect: (topicTag: string) => void;
+};
+
 function slugBody(title: string) {
   const lower = title.toLowerCase();
   if (lower.includes('planning commission')) return 'Planning Commission';
@@ -21,6 +26,59 @@ function normalizeUploadedDate(value?: string) {
   const month = value.slice(4, 6);
   const day = value.slice(6, 8);
   return `${year}-${month}-${day}`;
+}
+
+function formatTopicLabel(tag: string) {
+  return tag.replace(/-/g, ' ');
+}
+
+function buildMeetingSummary(meeting: CivicWatchMeeting, topics: CivicWatchTopic[]) {
+  if (!topics.length) {
+    return 'Transcript analysis is still thin here, so this meeting does not have a reliable high-level summary yet.';
+  }
+
+  const topTopics = topics.slice(0, 3);
+  const topicBits = topTopics.map((topic) => `${formatTopicLabel(topic.tag)} (${topic.total_minutes} min)`);
+  const lead = `This ${slugBody(meeting.title).toLowerCase()} meeting was mainly about ${topicBits.join(', ')}.`;
+
+  const decisionTopics = topics.filter((topic) => topic.decision_signals).slice(0, 2).map((topic) => formatTopicLabel(topic.tag));
+  const upcomingTopics = topics.filter((topic) => topic.upcoming_signals).slice(0, 2).map((topic) => formatTopicLabel(topic.tag));
+
+  const tail: string[] = [];
+  if (decisionTopics.length) {
+    tail.push(`Decision-like language showed up around ${decisionTopics.join(' and ')}.`);
+  }
+  if (upcomingTopics.length) {
+    tail.push(`Possible follow-up or next-step signals appeared around ${upcomingTopics.join(' and ')}.`);
+  }
+
+  return [lead, ...tail].join(' ');
+}
+
+function TopicChart({ topics, onSelect }: TopicChartProps) {
+  const maxMinutes = Math.max(...topics.map((topic) => topic.total_minutes), 1);
+
+  return (
+    <div className="topic-chart" role="img" aria-label="Bar chart of top topics by estimated discussion time">
+      {topics.map((topic) => {
+        const width = `${Math.max((topic.total_minutes / maxMinutes) * 100, 8)}%`;
+        return (
+          <button
+            type="button"
+            key={topic.tag}
+            className="topic-chart-row"
+            onClick={() => onSelect(topic.tag)}
+          >
+            <span className="topic-chart-label">{formatTopicLabel(topic.tag)}</span>
+            <span className="topic-chart-bar-wrap">
+              <span className="topic-chart-bar" style={{ width }} />
+            </span>
+            <strong className="topic-chart-value">{topic.total_minutes} min</strong>
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 function TopicCard({ topic, active, onToggle }: { topic: CivicWatchTopic; active: boolean; onToggle: () => void }) {
@@ -133,49 +191,40 @@ export function CivicWatchPage({ meetings, appVersion }: Props) {
       <div className="civic-list">
         {filtered.length ? filtered.map((meeting) => {
           const sortedTopics = [...(meeting.topics || [])].sort((a, b) => b.total_minutes - a.total_minutes).slice(0, 8);
+          const summary = buildMeetingSummary(meeting, sortedTopics);
           return (
             <article className="civic-card" key={meeting.video_id}>
               <div className="civic-meta-row">
                 <span className="civic-badge">{slugBody(meeting.title)}</span>
                 <span className="small">Uploaded {normalizeUploadedDate(meeting.uploaded)}</span>
-                {meeting.prototype ? <span className="civic-badge muted-badge">Prototype analysis</span> : null}
               </div>
               <h2>{meeting.title}</h2>
-              <div className="civic-tags">
-                {meeting.issue_hits.map((tag) => (
-                  <button type="button" className="tag tag-button" key={`${meeting.video_id}-issue-${tag}`} onClick={() => setTagFilter(tag)}>{tag}</button>
-                ))}
-                {meeting.area_hits.map((tag) => (
-                  <button type="button" className="tag area-tag tag-button" key={`${meeting.video_id}-area-${tag}`} onClick={() => setTagFilter(tag)}>{tag}</button>
-                ))}
-              </div>
+              <p className="meeting-lede">{summary}</p>
 
-              <div className="meeting-summary-grid">
+              <div className="meeting-summary-grid single-panel">
                 <div className="meeting-summary-panel">
                   <div className="small">Top topics by estimated time</div>
-                  <div className="topic-glance-list">
-                    {sortedTopics.length ? sortedTopics.slice(0, 4).map((topic) => (
-                      <button
-                        type="button"
-                        key={`${meeting.video_id}-${topic.tag}`}
-                        className="topic-glance"
-                        onClick={() => setSelectedTopicKey(`${meeting.video_id}:${topic.tag}`)}
-                      >
-                        <span>{topic.tag}</span>
-                        <strong>{topic.total_minutes} min</strong>
-                      </button>
-                    )) : <div className="muted">No topic estimates yet.</div>}
-                  </div>
-                </div>
-
-                <div className="meeting-summary-panel">
-                  <div className="small">What this build can show</div>
-                  <ul className="meeting-capabilities">
-                    <li>estimated minutes per topic</li>
-                    <li>first-pass summaries from transcript windows</li>
-                    <li>representative snippets</li>
-                    <li>jump links into the source video</li>
-                  </ul>
+                  {sortedTopics.length ? (
+                    <>
+                      <TopicChart
+                        topics={sortedTopics.slice(0, 5)}
+                        onSelect={(topicTag) => setSelectedTopicKey(`${meeting.video_id}:${topicTag}`)}
+                      />
+                      <div className="topic-glance-list">
+                        {sortedTopics.slice(0, 4).map((topic) => (
+                          <button
+                            type="button"
+                            key={`${meeting.video_id}-${topic.tag}`}
+                            className="topic-glance"
+                            onClick={() => setSelectedTopicKey(`${meeting.video_id}:${topic.tag}`)}
+                          >
+                            <span>{formatTopicLabel(topic.tag)}</span>
+                            <strong>{topic.total_minutes} min</strong>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : <div className="muted">No topic estimates yet.</div>}
                 </div>
               </div>
 
