@@ -73,36 +73,24 @@ function buildMeetingSummary(meeting: CivicWatchMeeting, topics: CivicWatchTopic
     return 'Transcript analysis is still thin here, so this meeting does not have a reliable high-level summary yet.';
   }
 
+  const body = slugBody(meeting.title).toLowerCase();
   const topTopics = topics.slice(0, 3);
   const topicBits = topTopics.map((topic) => `${formatTopicLabel(topic.tag)} (${topic.total_minutes} min)`);
-  const lead = `This ${slugBody(meeting.title).toLowerCase()} meeting was mainly about ${joinList(topicBits)}.`;
+  const lead = `This ${body} meeting was mainly about ${joinList(topicBits)}.`;
 
-  const concreteDetails = topTopics
-    .map((topic) => topicDetailLine(topic))
-    .filter(Boolean)
-    .slice(0, 2);
+  const decisionTags = topics.filter((topic) => topic.decision_signals).map((topic) => formatTopicLabel(topic.tag));
+  const upcomingTags = topics.filter((topic) => topic.upcoming_signals).map((topic) => formatTopicLabel(topic.tag));
 
   const tail: string[] = [];
-  if (concreteDetails.length) {
-    tail.push(`Most of the concrete discussion was about ${concreteDetails.join(' — ')}.`);
+  if (decisionTags.length) {
+    tail.push(`The discussion included segments where potential decisions were on the table around ${joinList(decisionTags.slice(0, 3))}.`);
+  }
+  if (upcomingTags.length) {
+    tail.push(`There were also conversations setting up future hearings or follow-up work around ${joinList(upcomingTags.slice(0, 3))}.`);
   }
 
-  const decisionDetails = topics
-    .filter((topic) => topic.decision_signals)
-    .map((topic) => topicDetailLine(topic))
-    .filter(Boolean)
-    .slice(0, 1);
-  if (decisionDetails.length) {
-    tail.push(`Decision-related language showed up around ${decisionDetails[0]}.`);
-  }
-
-  const upcomingDetails = topics
-    .filter((topic) => topic.upcoming_signals)
-    .map((topic) => topicDetailLine(topic))
-    .filter(Boolean)
-    .slice(0, 1);
-  if (upcomingDetails.length) {
-    tail.push(`Possible next steps or follow-up came up around ${upcomingDetails[0]}.`);
+  if (!tail.length) {
+    tail.push('Use the topic drilldown below to see specific snippets and timestamps for what was debated.');
   }
 
   return [lead, ...tail].join(' ');
