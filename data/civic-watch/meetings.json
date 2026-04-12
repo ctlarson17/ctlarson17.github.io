@@ -878,6 +878,29 @@
         ]
       }
     ],
+    "decision_points": [
+      {
+        "summary": "Council reviewed development patterns in the Northwest Quadrant/UIPA area and what kinds of projects, jobs, and transit options they want to encourage there.",
+        "topic_tags": [
+          "development",
+          "planning"
+        ]
+      },
+      {
+        "summary": "They discussed a development agreement for a specific site that could allow two-family dwellings, cottage-style units, row homes, and multifamily housing, and what conditions should attach to that agreement.",
+        "topic_tags": [
+          "development",
+          "zoning"
+        ]
+      },
+      {
+        "summary": "They received a briefing on state tax reforms, including ideas like a 5% cap on property tax growth and changes to how 'new growth' is calculated, and how those changes would affect the city\u2019s budget flexibility and fund balance rules.",
+        "topic_tags": [
+          "tax",
+          "budget"
+        ]
+      }
+    ],
     "prototype": true,
     "analysis_version": 3,
     "transcript_cue_count": 5937,
@@ -2081,6 +2104,35 @@
         ]
       }
     ],
+    "decision_points": [
+      {
+        "summary": "The Planning Division walked through its annual report, focusing on how many applications of different types they are seeing, how long they take, and which cases go to the Planning Commission versus staff.",
+        "topic_tags": [
+          "planning"
+        ]
+      },
+      {
+        "summary": "The commission reviewed recent zoning code consolidations and amendments (including RMF35/RMF45 and mixed-use zones) and how those changes affect what applications must come back to the commission.",
+        "topic_tags": [
+          "zoning",
+          "development"
+        ]
+      },
+      {
+        "summary": "They examined the consolidated fee schedule for land-use applications, where fees only cover a fraction of staff time, and discussed questions around fee waivers for smaller residential projects.",
+        "topic_tags": [
+          "fees",
+          "budget"
+        ]
+      },
+      {
+        "summary": "They received briefing on how state-level changes and local rules affect requirements to preserve or remove trees on development sites.",
+        "topic_tags": [
+          "trees",
+          "conservation"
+        ]
+      }
+    ],
     "prototype": true,
     "analysis_version": 3,
     "transcript_cue_count": 5246,
@@ -2753,6 +2805,29 @@
             "snippet": "North Point community should redevelopment should redevelop and if redevelopment occurs, the plan addresses the protection of sensitive lands",
             "score": 14.27
           }
+        ]
+      }
+    ],
+    "decision_points": [
+      {
+        "summary": "The commission debated a text amendment to the landscaping and buffer standards, focusing on how construction activity near trees affects roots and how to define standards that realistically protect specimen trees.",
+        "topic_tags": [
+          "construction",
+          "trees"
+        ]
+      },
+      {
+        "summary": "They discussed how water conservation goals are written into community and area plans, and how those goals should show up in zoning and development standards.",
+        "topic_tags": [
+          "water conservation",
+          "planning"
+        ]
+      },
+      {
+        "summary": "They reviewed the North Point small area plan\u2019s approach to development near sensitive lands, including the use of transfer of development rights to cluster development away from those areas.",
+        "topic_tags": [
+          "development",
+          "conservation"
         ]
       }
     ],
@@ -4213,6 +4288,30 @@
             "snippet": "public input versus for a reason, this thing has got more than any other rezone we've ever looked at, right?",
             "score": 14.28
           }
+        ]
+      }
+    ],
+    "decision_points": [
+      {
+        "summary": "The commission considered Ballpark-area zoning map and text amendments intended to align zoning around the Smith\u2019s Ballpark site with the adopted Ballpark Next community design plan.",
+        "topic_tags": [
+          "zoning",
+          "development"
+        ]
+      },
+      {
+        "summary": "They debated how much of the ballpark site should remain public open/green space versus being used for new development, including concerns about tree canopy and urban heat island effects.",
+        "topic_tags": [
+          "open space",
+          "trees"
+        ]
+      },
+      {
+        "summary": "They reviewed citywide 'expanding housing options' changes that would allow more small-lot and missing-middle housing (like duplexes and quads) in certain residential zones, and how to handle lots without street frontage and small lot standards.",
+        "topic_tags": [
+          "development",
+          "housing",
+          "zoning"
         ]
       }
     ],
