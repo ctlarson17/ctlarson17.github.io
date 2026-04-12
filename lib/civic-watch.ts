@@ -28,6 +28,11 @@ export type CivicWatchTopic = {
   windows?: CivicWatchTopicWindow[];
 };
 
+export type CivicWatchDecisionPoint = {
+  summary: string;
+  topic_tags?: string[];
+};
+
 export type CivicWatchMeeting = {
   video_id: string;
   title: string;
@@ -36,6 +41,7 @@ export type CivicWatchMeeting = {
   issue_hits: string[];
   area_hits: string[];
   topics?: CivicWatchTopic[];
+  decision_points?: CivicWatchDecisionPoint[];
   prototype?: boolean;
 };
 

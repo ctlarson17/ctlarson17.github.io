@@ -242,6 +242,13 @@ export function CivicWatchPage({ meetings, appVersion }: Props) {
               </div>
               <h2>{meeting.title}</h2>
               <p className="meeting-lede">{summary}</p>
+              {meeting.decision_points?.length ? (
+                <ul className="meeting-decisions">
+                  {meeting.decision_points.map((point, index) => (
+                    <li key={`${meeting.video_id}-dp-${index}`}>{point.summary}</li>
+                  ))}
+                </ul>
+              ) : null}
 
               <div className="meeting-summary-grid single-panel">
                 <div className="meeting-summary-panel">

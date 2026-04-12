@@ -486,6 +486,15 @@ select.input {
   color: var(--civic-text-soft);
   max-width: 75ch;
 }
+.meeting-decisions {
+  margin: 10px 0 0;
+  padding-left: 1.1rem;
+  color: var(--civic-text);
+  line-height: 1.7;
+}
+.meeting-decisions li + li {
+  margin-top: 4px;
+}
 .civic-meta-row {
   display: flex;
   flex-wrap: wrap;
